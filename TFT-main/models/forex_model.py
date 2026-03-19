@@ -171,7 +171,7 @@ class TFTForexModel(BaseTFTModel):
         from pytorch_forecasting import TemporalFusionTransformer, TimeSeriesDataSet
         from pytorch_forecasting.data import NaNLabelEncoder
         from pytorch_forecasting.metrics import QuantileLoss
-        import pytorch_lightning as pl
+        import lightning.pytorch as pl
 
         df = self.prepare_features(data)
 
@@ -317,11 +317,20 @@ class TFTForexModel(BaseTFTModel):
             return False
         try:
             from pytorch_forecasting import TemporalFusionTransformer
-            checkpoint = torch.load(path, map_location="cpu")
+            checkpoint = torch.load(path, map_location="cpu", weights_only=False)
             self.config = checkpoint["config"]
             self._training_dataset = checkpoint["training_dataset"]
             self._trained_at = checkpoint.get("trained_at")
-            self._model = TemporalFusionTransformer.from_dataset(self._training_dataset)
+            from pytorch_forecasting.metrics import QuantileLoss
+            self._model = TemporalFusionTransformer.from_dataset(
+                self._training_dataset,
+                learning_rate=self.config["learning_rate"],
+                hidden_size=self.config["hidden_size"],
+                lstm_layers=self.config["lstm_layers"],
+                attention_head_size=self.config["attention_head_size"],
+                dropout=self.config["dropout"],
+                loss=QuantileLoss(quantiles=self.config["quantiles"]),
+            )
             self._model.load_state_dict(checkpoint["model_state_dict"])
             self._is_loaded = True
             logger.info("TFT-Forex loaded from %s", path)

@@ -205,6 +205,37 @@ services:
       - trading-engine
     restart: unless-stopped
 
+  # APEX Paper Trader — Multi-Strategy Ensemble Runner
+  paper-trader:
+    build:
+      context: .
+      dockerfile: paper-trader/Dockerfile
+    ports:
+      - "8010:8010"
+    environment:
+      - ALPACA_API_KEY=${ALPACA_API_KEY}
+      - ALPACA_SECRET_KEY=${ALPACA_SECRET_KEY}
+      - ALPACA_BASE_URL=${ALPACA_BASE_URL:-https://paper-api.alpaca.markets}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=tft_trading
+      - DB_USER=tft_user
+      - DB_PASSWORD=tft_password
+      - REDIS_URL=redis://redis:6379
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - PAPER_TRADING_SYMBOLS=${PAPER_TRADING_SYMBOLS:-AAPL,MSFT,GOOGL,AMZN,NVDA,META,TSLA,JPM,BAC,XOM}
+      - PAPER_FX_PAIRS=${PAPER_FX_PAIRS:-EURUSD,GBPUSD,USDJPY,AUDUSD,USDCAD,USDCHF}
+      - PAPER_SCHEDULE_HOUR=${PAPER_SCHEDULE_HOUR:-10}
+      - PAPER_SCHEDULE_MINUTE=${PAPER_SCHEDULE_MINUTE:-0}
+      - PAPER_INITIAL_CAPITAL=${PAPER_INITIAL_CAPITAL:-100000}
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    volumes:
+      - ./strategies:/app/strategies
+      - ./trading:/app/trading
+
   # Monitoring Services
   prometheus:
     image: prom/prometheus:latest

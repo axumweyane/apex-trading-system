@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX — System Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #030407;
+  --deep: #080b12;
+  --surface: #0d1018;
+  --raised: #131620;
+  --border: #1a1f2e;
+  --border2: #232a3d;
+  --text: #b8c2d8;
+  --text-bright: #e8edf8;
+  --text-dim: #3e4a65;
+  --awet: #f0b429;
+  --awet-dim: #f0b42912;
+  --unified: #00d4ff;
+  --unified-dim: #00d4ff0e;
+  --lean: #a855f7;
+  --lean-dim: #a855f70e;
+  --apex: #00e676;
+  --apex-dim: #00e67610;
+  --red: #ff4444;
+  --orange: #ff7043;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRID BG ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.25;
+  pointer-events: none; z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, #00d4ff08, transparent),
+    radial-gradient(ellipse 60% 40% at 90% 110%, #a855f706, transparent),
+    radial-gradient(ellipse 50% 50% at 50% 50%, #00e67604, transparent);
+  pointer-events: none; z-index: 0;
+}
+
+.wrap { max-width: 1320px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+/* ── HEADER ── */
+header {
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.header-inner {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  flex-wrap: wrap; gap: 20px;
+}
+
+.logo-block .eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--apex); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.logo-block .eyebrow::before {
+  content: ''; width: 24px; height: 1px; background: var(--apex);
+}
+.logo-block h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 8vw, 96px);
+  letter-spacing: 0.06em; line-height: 0.9;
+  background: linear-gradient(135deg, var(--apex) 0%, var(--unified) 55%, var(--lean) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.logo-block h1 span {
+  font-size: 0.38em; letter-spacing: 0.2em;
+  background: none; -webkit-text-fill-color: var(--text-dim);
+  display: block; margin-top: 4px;
+}
+
+.header-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; color: var(--text-dim); text-align: right; line-height: 2;
+}
+
+/* ── LEGEND ── */
+.legend {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 16px 0; border-bottom: 1px solid var(--border);
+}
+.leg {
+  display: flex; align-items: center; gap: 7px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 5px 12px 5px 8px;
+  border: 1px solid;
+}
+.leg-dot { width: 8px; height: 8px; }
+.leg-awet    { color: var(--awet);    border-color: #f0b42940; background: var(--awet-dim); }
+.leg-awet .leg-dot    { background: var(--awet); }
+.leg-unified { color: var(--unified); border-color: #00d4ff30; background: var(--unified-dim); }
+.leg-unified .leg-dot { background: var(--unified); }
+.leg-lean    { color: var(--lean);    border-color: #a855f730; background: var(--lean-dim); }
+.leg-lean .leg-dot    { background: var(--lean); }
+.leg-apex    { color: var(--apex);    border-color: #00e67640; background: var(--apex-dim); }
+.leg-apex .leg-dot    { background: var(--apex); }
+
+/* ── ARCH LAYOUT ── */
+.arch-layout {
+  padding: 40px 0 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* LAYER ROW */
+.layer {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0;
+  min-height: 80px;
+  position: relative;
+}
+
+/* vertical line on left */
+.layer-label {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 16px 20px 16px 0;
+  border-right: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border);
+}
+.layer-label .lnum {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 5px;
+}
+.layer-label .lname {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px; letter-spacing: 0.1em; color: var(--text-bright);
+  line-height: 1.1;
+}
+
+/* NODES */
+.layer-nodes {
+  display: flex; flex-wrap: wrap; align-items: flex-start;
+  gap: 6px; padding: 16px 0 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* NODE CARD */
+.node {
+  display: flex; flex-direction: column;
+  padding: 9px 14px;
+  border: 1px solid;
+  font-size: 11px;
+  cursor: default;
+  transition: all 0.18s ease;
+  position: relative;
+  overflow: hidden;
+  min-width: 130px;
+}
+.node::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.node:hover { transform: translateY(-2px); }
+
+.node-awet    { border-color: #f0b42930; background: var(--awet-dim);    color: var(--text-bright); }
+.node-awet::before    { background: var(--awet); }
+.node-awet:hover    { border-color: #f0b42960; background: #f0b42918; }
+.node-unified { border-color: #00d4ff25; background: var(--unified-dim); color: var(--text-bright); }
+.node-unified::before { background: var(--unified); }
+.node-unified:hover { border-color: #00d4ff55; background: #00d4ff14; }
+.node-lean    { border-color: #a855f725; background: var(--lean-dim);    color: var(--text-bright); }
+.node-lean::before    { background: var(--lean); }
+.node-lean:hover    { border-color: #a855f755; background: #a855f714; }
+.node-apex    { border-color: #00e67638; background: var(--apex-dim);    color: var(--text-bright); }
+.node-apex::before    { background: var(--apex); }
+.node-apex:hover    { border-color: #00e67668; background: #00e67618; }
+
+.node-name {
+  font-weight: 600; font-size: 11.5px; color: var(--text-bright);
+  line-height: 1.3; margin-bottom: 4px;
+}
+.node-src {
+  font-family: 'Space Mono', monospace;
+  font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  opacity: 0.7;
+}
+.node-awet    .node-src { color: var(--awet); }
+.node-unified .node-src { color: var(--unified); }
+.node-lean    .node-src { color: var(--lean); }
+.node-apex    .node-src { color: var(--apex); }
+
+.node-new {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--apex); margin-top: 4px; opacity: 0.9;
+}
+
+/* node weight badge */
+.node-weight {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; color: var(--text-dim); margin-top: 2px;
+}
+
+/* ── FLOW ARROW ── */
+.flow-arrow {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0 10px 160px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--text-dim);
+  position: relative;
+}
+.flow-arrow::before {
+  content: '';
+  width: 100%; height: 1px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+  position: absolute; bottom: 0; left: 160px;
+  opacity: 0.5;
+}
+.flow-icon {
+  font-size: 18px; color: var(--border2);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.flow-topic {
+  background: var(--raised); border: 1px solid var(--border2);
+  padding: 2px 10px;
+  font-size: 9px; letter-spacing: 0.15em;
+  color: var(--unified); white-space: nowrap;
+}
+
+/* ── CRITICAL FIXES BAR ── */
+.fixes-section {
+  margin-top: 48px;
+  border: 1px solid #ff444430;
+  background: #ff44440a;
+  padding: 24px 28px;
+}
+.fixes-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+}
+.fixes-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px; letter-spacing: 0.1em; color: var(--red);
+}
+.fixes-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em;
+}
+.fixes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
+}
+.fix-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px;
+  background: var(--raised); border: 1px solid var(--border2);
+  font-size: 11.5px;
+}
+.fix-id {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; font-weight: 700; padding: 2px 6px; flex-shrink: 0;
+}
+.fix-crit  { color: var(--red);    background: #ff444415; border: 1px solid #ff444430; }
+.fix-high  { color: var(--awet);   background: var(--awet-dim); border: 1px solid #f0b42930; }
+.fix-text { color: var(--text-dim); font-size: 11.5px; line-height: 1.4; }
+
+/* ── ROADMAP ── */
+.roadmap-section { margin-top: 48px; }
+.roadmap-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: 0.08em; color: var(--text-bright);
+  margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;
+}
+
+.roadmap-phases {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.phase {
+  padding: 20px 16px;
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.phase:last-child { border-right: none; }
+.phase::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.ph-0::before { background: var(--red); }
+.ph-1::before { background: var(--awet); }
+.ph-2::before { background: var(--unified); }
+.ph-3::before { background: var(--apex); }
+.ph-4::before { background: var(--lean); }
+
+.phase-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px; line-height: 1; margin-bottom: 2px;
+}
+.ph-0 .phase-num { color: var(--red); }
+.ph-1 .phase-num { color: var(--awet); }
+.ph-2 .phase-num { color: var(--unified); }
+.ph-3 .phase-num { color: var(--apex); }
+.ph-4 .phase-num { color: var(--lean); }
+
+.phase-name { font-size: 11.5px; font-weight: 700; color: var(--text-bright); margin-bottom: 4px; }
+.phase-time { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--text-dim); margin-bottom: 14px; }
+.phase-items { list-style: none; }
+.phase-items li {
+  font-size: 10.5px; color: var(--text-dim);
+  padding: 5px 0 5px 12px;
+  border-bottom: 1px solid var(--border);
+  position: relative; line-height: 1.4;
+}
+.phase-items li:last-child { border-bottom: none; }
+.phase-items li::before {
+  content: '›'; position: absolute; left: 0; color: var(--text-dim);
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 32px 0 40px;
+  border-top: 1px solid var(--border);
+  margin-top: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px; letter-spacing: 0.12em; color: var(--apex);
+}
+.footer-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; color: var(--text-dim); line-height: 2; text-align: right;
+}
+
+/* ── SCORE OVERVIEW ── */
+.score-bar {
+  display: flex; gap: 0; border: 1px solid var(--border);
+  margin-bottom: 48px; overflow: hidden;
+}
+.score-block {
+  flex: 1; padding: 20px 18px;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.score-block:last-child { border-right: none; }
+.score-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 8px;
+}
+.score-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px; line-height: 1;
+}
+.score-desc { font-size: 10.5px; color: var(--text-dim); margin-top: 4px; line-height: 1.4; }
+
+.sv-apex    { color: var(--apex); }
+.sv-unified { color: var(--unified); }
+.sv-awet    { color: var(--awet); }
+.sv-lean    { color: var(--lean); }
+.sv-red     { color: var(--red); }
+
+/* responsive */
+@media (max-width: 900px) {
+  .layer { grid-template-columns: 100px 1fr; }
+  .flow-arrow { padding-left: 120px; }
+  .roadmap-phases { grid-template-columns: repeat(2, 1fr); }
+  .phase { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+}
+@media (max-width: 640px) {
+  .layer { grid-template-columns: 1fr; }
+  .layer-label { border-right: none; border-bottom: 1px solid var(--border2); padding: 12px 0; }
+  .layer-nodes { padding-left: 0; }
+  .flow-arrow { padding-left: 0; }
+  .score-bar { flex-direction: column; }
+  .score-block { border-right: none; border-bottom: 1px solid var(--border); }
+  .roadmap-phases { grid-template-columns: 1fr; }
+}
+
+/* entry animation */
+.layer, .score-bar, .fixes-section, .roadmap-section {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 0.5s ease forwards;
+}
+.layer:nth-child(1)  { animation-delay: 0.05s; }
+.layer:nth-child(2)  { animation-delay: 0.1s; }
+.layer:nth-child(3)  { animation-delay: 0.15s; }
+.layer:nth-child(4)  { animation-delay: 0.2s; }
+.layer:nth-child(5)  { animation-delay: 0.25s; }
+.layer:nth-child(6)  { animation-delay: 0.3s; }
+.layer:nth-child(7)  { animation-delay: 0.35s; }
+.layer:nth-child(8)  { animation-delay: 0.4s; }
+.layer:nth-child(9)  { animation-delay: 0.45s; }
+.flow-arrow { opacity: 0; animation: fadeUp 0.4s ease forwards; }
+
+.score-bar     { animation-delay: 0.05s; }
+.fixes-section { animation-delay: 0.1s; }
+.roadmap-section { animation-delay: 0.12s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="logo-block">
+        <div class="eyebrow">System Architecture · Blueprint 2026</div>
+        <h1>APEX<span>Autonomous Predictive Execution</span></h1>
+      </div>
+      <div class="header-meta">
+        AWET-main + Unified Platform + QuantConnect Lean<br>
+        Three codebases · One correlation_id · End-to-end<br>
+        <span style="color:var(--apex)">Paper Trading Only · Not Financial Advice</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="leg leg-awet"><div class="leg-dot"></div>AWET-main Infrastructure</div>
+    <div class="leg leg-unified"><div class="leg-dot"></div>Unified Platform</div>
+    <div class="leg leg-lean"><div class="leg-dot"></div>QuantConnect Lean</div>
+    <div class="leg leg-apex"><div class="leg-dot"></div>APEX New / Net-New Features</div>
+  </div>
+
+  <!-- SCORE OVERVIEW -->
+  <div style="margin-top:32px;">
+  <div class="score-bar">
+    <div class="score-block">
+      <div class="score-label">Total Layers</div>
+      <div class="score-val sv-apex">8</div>
+      <div class="score-desc">Data → Feature → Alpha → Signal → Portfolio → Risk → Execution → Observability</div>
+    </div>
+    <div class="score-block">
+      <div class="score-label">New APEX Nodes</div>
+      <div class="score-val sv-apex">★ 9</div>
+      <div class="score-desc">Black-Litterman, Bayesian Weights, VWAP, ETF Universe, Signal API, TimescaleDB…</div>
+    </div>
+    <div class="score-block">
+      <div class="score-label">Critical Fixes</div>
+      <div class="score-val sv-red">11</div>
+      <div class="score-desc">Must fix before building. CF-3/4 make all your Sharpe numbers wrong by 20×</div>
+    </div>
+    <div class="score-block">
+      <div class="score-label">Est. Fix Time</div>
+      <div class="score-val sv-awet">~19h</div>
+      <div class="score-desc">Then: solid foundation for full APEX build-out</div>
+    </div>
+    <div class="score-block">
+      <div class="score-label">Phases to Prod</div>
+      <div class="score-val sv-unified">5</div>
+      <div class="score-desc">Ph-00 through Ph-04 → institutionally competitive signal platform</div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       ARCHITECTURE DIAGRAM
+  ══════════════════════════════════════════ -->
+  <div class="arch-layout">
+
+    <!-- LAYER 0: DATA INGESTION -->
+    <div class="layer">
+      <div class="layer-label">
+        <div class="lnum">00</div>
+        <div class="lname">Data<br>Ingestion</div>
+      </div>
+      <div class="layer-nodes">
+        <div class="node node-awet">
+          <div class="node-name">Polygon.io / Alpaca</div>
+          <div class="node-src">AWET · Primary feed</div>
+        </div>
+        <div class="node node-awet">
+          <div class="node-name">yfinance Fallback</div>
+          <div class="node-src">AWET · Backup</div>
+        </div>
+        <div class="node node-awet">
+          <div class="node-name">Reddit Sentiment</div>
+          <div class="node-src">AWET · Finally wired</div>
+          <div class="node-new">★ NEW — feeds ensemble (10% weight)</div>
+        </div>
+        <div class="node node-apex">
+          <div class="node-name">ETF Universe Selector</div>
+          <div class="node-src">Lean → APEX</div>
+          <div class="node-new">★ NEW — replaces hardcoded universe.csv</div>
+        </div>
+        <div class="node node-apex">
+          <div class="node-name">TimescaleDB Agg Views</div>
+          <div class="node-src">NEW</div>
+          <div class="node-new">★ 5m / 15m / 1h materialized</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">
+      <span class="flow-icon">↓</span>
+      <span class="flow-topic">market.raw</span>
+      <span style="color:var(--text-dim)">Kafka topic</span>
+    </div>
+
+    <!-- LAYER 1: FEATURE ENGINEERING -->
+    <div class="layer">
+      <div class="layer-label">
+        <div class="lnum">01</div>
+        <div class="lname">Feature<br>Engineering</div>
+      </div>
+      <div class="layer-nodes">
+        <div class="node node-awet">
+          <div class="node-name">Returns 1/5/15-bar</div>
+          <div class="node-src">AWET</div>
+        </div>
+        <div class="node node-awet">
+          <div class="node-name">Volatility 5/15</div>
+          <div class="node-src">AWET</div>
+        </div>
+        <div class="node node-awet">
+          <div class="node-name">Calendar Features</div>
+          <div class="node-src">AWET</div>
+        </div>
+        <div class="node node-lean">
+          <div class="node-name">ATR / Bollinger Bands</div>
+          <div class="node-src">Lean native</div>
+          <div class="node-new">★ NEW warmup-aware</div>
+        </div>
+        <div class="node node-lean">
+          <div class="node-name">Stochastic / ADX</div>
+          <div class="node-src">Lean native</div>
+          <div class="node-new">★ NEW mean-reversion alpha</div>
+        </div>
+        <div class="node node-unified">
+          <div class="node-name">Normalization + JSON Sidecar</div>
+          <div class="node-src">Unified · CF-4 fixed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">
+      <span class="flow-icon">↓</span>
+      <span class="flow-topic">market.engineered</span>
+      <span style="color:var(--text-dim)">Kafka topic</span>
+    </div>
+
+    <!-- LAYER 2: ALPHA SOURCES -->
+    <div class="layer">
+      <div class="layer-label">
+        <div class="lnum">02</div>
+        <div class="lname">Alpha<br>Sources</div>
+      </div>
+      <div class="layer-nodes">
+        <div class="node node-unified">
+          <div class="node-name">TFT Forecaster (ONNX)</div>
+          <div class="node-src">Unified · Walk-forward fixed</div>
+          <div class="node-weight">initial weight: 0.40</div>
+        </div>
+        <div class="node node-lean">
+          <div class="node-name">RSI-14</div>
+          <div class="node-src">Lean native</div>
+          <div class="node-weight">initial weight: 0.15</div>
+        </div>
+        <div class="node node-lean">
+          <div class="node-name">EMA Cross (12/26)</div>
+          <div class="node-src">Lean native</div>
+          <div class="node-weight">initial weight: 0.15</div>
+        </div>
+        <div class="node node-lean">
+          <div class="node-name">MACD (12/26/9)</div>
+          <div class="node-src">Lean native</div>
+          <div class="node-weight">initial weight: 0.10</div>
+        </div>
+        <div class="node node-apex">
+          <div class="node-name">Stochastic %K / %D</div>
+          <div class="node-src">Lean → APEX</div>
+          <div class="node-new">★ NEW · initial weight: 0.10</div>
+        </div>
+        <div class="node node-apex">
+          <div class="node-name">Reddit Sentiment</div>
+          <div class="node-src">AWET wired in</div>
+          <div class="node-new">★ NEW · initial weight: 0.10</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">
+      <span class="flow-icon">↓</span>
+      <span class="flow-topic">alpha.signals</span>
+      <span style="color:var(--text-dim)">Kafka topic</span>
+    </div>
+
+    <!-- LAYER 3: SIGNAL ENGINE -->
+    <div class="layer">
+      <div class="layer-label">
+        <div class="lnum">03</div>
+        <div class="lname">Signal<br>Engine</div>
+      </div>
+      <div class="layer-nodes">
+        <div class="node node-unified">
+          <div class="node-name">Regime Filter</div>
+          <div class="node-src">Unified · HI-4 fixed</div>
+          <div class="node-weight">Bull / Bear / Sideways — direction-aware</div>
+        </div>
+        <div class="node node-unified">
+          <div class="node-name">Platt Calibration</div>
+          <div class="node-src">Unified · HI-3 fixed</div>
+          <div class="node-weight">raises on unfitted scaler</div>
+        </div>
+        <div class="node node-apex">
+          <div class="node-name">Bayesian Weight Updater</div>
+          <div class="node-src">NEW — replaces fixed weights</div>
+          <div class="node-new">★ KEY FEATURE — beta-binomial, rolling 500 bars</div>
+        </div>
+        <div class="node node-unified">
+          <div class="node-name">Market Hours / Liquidity / Spread Filters</div>
+          <div class="node-src">Unified · HI-5 DST fixed via Lean</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">
+      <span class="flow-icon">↓</span>
+      <span class="flow-topic">signals.scored</span>
+      <span style="color:var(--text-dim)">Kafka topic</span>
+    </div>
+
+    <!-- LAYER 4: PORTFOLIO CONSTRUCTION -->
+    <div class="layer">
+      <div class="layer-label">
+        <div class="lnum">04</div>
+        <div class="lname">Portfolio<br>Construction</div>
+      </div>
+      <div class="layer-nodes">
+        <div class="node node-apex">
+          <div class="node-name">Black-Litterman Model</div>
+          <div class="node-src">Lean → APEX</div>
+          <div class="node-new">★ KEY FEATURE — TFT q50 forecasts as Bayesian views, uncertainty from q90-q10</div>
+        </div>
+        <div class="node node-apex">
+          <div class="node-name">Confidence-Weighted Allocation</div>
+          <div class="node-src">Lean → APEX</div>
+          <div class="node-new">★ NEW — scales by calibrated_confidence</div>
+        </div>
+        <div class="node node-unified">
+          <div class="node-name">Sector Exposure Cap (30%)</div>
+          <div class="node-src">Unified · HI-1 wired</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">
+      <span class="flow-icon">↓</span>
+      <span class="flow-topic">portfolio.targets</span>
+      <span style="color:var(--text-dim)">Kafka topic</span>
+    </div>
+
+    <!-- LAYER 5: RISK ENGINE -->
+    <div class="layer">
+      <div class="layer-label">
+        <div class="lnum">05</div>
+        <div class="lname">Risk<br>Engine</div>
+      </div>
+      <div class="layer-nodes">
+        <div class="node node-unified">
+          <div class="node-name">CVaR-95 (real formula)</div>
+          <div class="node-src">Unified · CF-5 fixed</div>
+          <div class="node-weight">historical simulation, no shortcut</div>
+        </div>
+        <div class="node node-lean">
+          <div class="node-name">MaxDrawdown Portfolio</div>
+          <div class="node-src">Lean · wired in (HI-1)</div>
+        </div>
+        <div class="node node-lean">
+          <div class="node-name">Trailing Stop Risk Model</div>
+          <div class="node-src">Lean · wired in (HI-1)</div>
+        </div>
+        <div class="node node-unified">
+          <div class="node-name">Redis Kill Switch (fail-closed)</div>
+          <div class="node-src">Unified · CF-6 fixed</div>
+          <div class="node-weight">AOF + healthcheck (HI-8)</div>
+        </div>
+        <div class="node node-lean">
+          <div class="node-name">Correlation Spike Check</div>
+          <div class="node-src">Unified · HI-2 wired</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">
+      <span class="flow-icon">↓</span>
+      <span class="flow-topic">risk.approved</span>
+      <span style="color:var(--text-dim)">&nbsp;/&nbsp;</span>
+      <span class="flow-topic" style="color:var(--red);border-color:#ff444430;">risk.rejected</span>
+    </div>
+
+    <!-- LAYER 6: EXECUTION -->
+    <div class="layer">
+      <div class="layer-label">
+        <div class="lnum">06</div>
+        <div class="lname">Execution</div>
+      </div>
+      <div class="layer-nodes">
+        <div class="node node-apex">
+          <div class="node-name">VWAP Execution Model</div>
+          <div class="node-src">Lean → APEX</div>
+          <div class="node-new">★ NEW — replaces market orders · max 10% vol / slice · IOC limit orders</div>
+        </div>
+        <div class="node node-awet">
+          <div class="node-name">Bracket Orders (TP 3% / SL 1.5%)</div>
+          <div class="node-src">Unified · CF-7 flush fixed</div>
+        </div>
+        <div class="node node-unified">
+          <div class="node-name">Alpaca Paper API — Triple Gate</div>
+          <div class="node-src">Unified · CF-8 timeout fixed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">
+      <span class="flow-icon">↓</span>
+      <span class="flow-topic">execution.completed</span>
+      <span style="color:var(--text-dim)">Kafka topic</span>
+    </div>
+
+    <!-- LAYER 7: OBSERVABILITY -->
+    <div class="layer">
+      <div class="layer-label">
+        <div class="lnum">07</div>
+        <div class="lname">Observability</div>
+      </div>
+      <div class="layer-nodes">
+        <div class="node node-awet">
+          <div class="node-name">Prometheus + Grafana</div>
+          <div class="node-src">AWET</div>
+        </div>
+        <div class="node node-unified">
+          <div class="node-name">MLflow (per-fold tracking)</div>
+          <div class="node-src">Unified</div>
+        </div>
+        <div class="node node-awet">
+          <div class="node-name">Telegram + Twilio Alerts</div>
+          <div class="node-src">AWET</div>
+        </div>
+        <div class="node node-unified">
+          <div class="node-name">structlog (correlation_id)</div>
+          <div class="node-src">Unified · MD-6 fixed</div>
+        </div>
+        <div class="node node-awet">
+          <div class="node-name">LLM Trace Table</div>
+          <div class="node-src">AWET</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow" style="border-bottom: none;">
+      <span class="flow-icon">↓</span>
+      <span style="color:var(--text-dim)">audit_trail (every stage, every decision)</span>
+    </div>
+
+    <!-- LAYER 8: LLM AGENTS -->
+    <div class="layer">
+      <div class="layer-label">
+        <div class="lnum">08</div>
+        <div class="lname">LLM<br>Agents</div>
+      </div>
+      <div class="layer-nodes">
+        <div class="node node-awet">
+          <div class="node-name">Night Trainer (02:00)</div>
+          <div class="node-src">AWET + CF-1/2/3/4 fixed</div>
+        </div>
+        <div class="node node-awet">
+          <div class="node-name">Morning Deployer (08:30)</div>
+          <div class="node-src">AWET</div>
+        </div>
+        <div class="node node-awet">
+          <div class="node-name">Trade Watchdog (*/15 min)</div>
+          <div class="node-src">AWET</div>
+        </div>
+        <div class="node node-apex">
+          <div class="node-name">Signal Analyst Agent</div>
+          <div class="node-src">NEW · qwen2.5:32b (local Ollama)</div>
+          <div class="node-new">★ NEW — 3-sentence explanation per signal</div>
+        </div>
+        <div class="node node-apex">
+          <div class="node-name">Walk-Forward Reviewer Agent</div>
+          <div class="node-src">NEW · Telegram PDF report</div>
+          <div class="node-new">★ NEW — outlier fold detection, auto-review</div>
+        </div>
+        <div class="node node-apex">
+          <div class="node-name">Signal Provider API</div>
+          <div class="node-src">FastAPI · GET /signals/{symbol}</div>
+          <div class="node-new">★ NEW — external-facing signal endpoint</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end arch-layout -->
+
+  <!-- CRITICAL FIXES -->
+  <div class="fixes-section">
+    <div class="fixes-header">
+      <div>
+        <div class="fixes-title">⚠ Fix First — Before Building Anything New</div>
+        <div class="fixes-sub">CF-1 through CF-4 mean current model metrics are wrong. Everything built on top of wrong metrics is wrong. Est. ~19h total.</div>
+      </div>
+    </div>
+    <div class="fixes-grid">
+      <div class="fix-item">
+        <span class="fix-id fix-crit">CF-3 CRIT</span>
+        <div class="fix-text">√252 → √(252×390) annualization · <em style="color:var(--text-bright)">Sharpe wrong by 20×</em></div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-crit">CF-4 CRIT</span>
+        <div class="fix-text">Save normalization JSON sidecar · <em style="color:var(--text-bright)">every inference uses wrong stats silently</em></div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-crit">CF-10 CRIT</span>
+        <div class="fix-text">Fix duplicate YAML keys · <em style="color:var(--text-bright)">execution using wrong TP/SL values</em></div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-crit">HI-8 CRIT</span>
+        <div class="fix-text">Redis AOF + healthcheck · <em style="color:var(--text-bright)">kill switch state lost on crash</em></div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-high">CF-1 HIGH</span>
+        <div class="fix-text">select_best() → latest fold · deploying lucky model, not recent</div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-high">CF-2 HIGH</span>
+        <div class="fix-text">embargo_bars = 180 · OOS metrics inflated by leakage</div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-high">CF-5 HIGH</span>
+        <div class="fix-text">Real CVaR-95 formula · risk budgeting is statistically meaningless</div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-high">CF-6 HIGH</span>
+        <div class="fix-text">Redis fail-closed · ruin path: loss day resets on restart</div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-high">CF-7 HIGH</span>
+        <div class="fix-text">flush() before commit() · silent execution event loss</div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-high">HI-5 HIGH</span>
+        <div class="fix-text">DST-aware timezone · wrong signals 8 months/year</div>
+      </div>
+      <div class="fix-item">
+        <span class="fix-id fix-high">HI-1 HIGH</span>
+        <div class="fix-text">Wire UnifiedPortfolioRisk · Lean risk models are dead code</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div class="roadmap-section">
+    <div class="roadmap-title">Build Roadmap</div>
+    <div class="roadmap-phases">
+      <div class="phase ph-0">
+        <div class="phase-num">00</div>
+        <div class="phase-name">Fix the Foundation</div>
+        <div class="phase-time">~2–3 days</div>
+        <ul class="phase-items">
+          <li>Fix CF-1 through CF-10</li>
+          <li>Fix HI-1, 3, 4, 5, 6, 8</li>
+          <li>DoD checklist (DoD-1 to DoD-10)</li>
+          <li>First paper trade end-to-end</li>
+          <li>Confirm OOS Sharpe with correct √(252×390)</li>
+        </ul>
+      </div>
+      <div class="phase ph-1">
+        <div class="phase-num">01</div>
+        <div class="phase-name">Signal Expansion</div>
+        <div class="phase-time">~1 week</div>
+        <ul class="phase-items">
+          <li>Wire Reddit → ensemble (10%)</li>
+          <li>Stochastic %K/%D from Lean</li>
+          <li>ATR-based position sizing</li>
+          <li>Fix bear regime direction (HI-4)</li>
+          <li>Bayesian alpha weight tracker</li>
+        </ul>
+      </div>
+      <div class="phase ph-2">
+        <div class="phase-num">02</div>
+        <div class="phase-name">Universe + Portfolio</div>
+        <div class="phase-time">~1 week</div>
+        <ul class="phase-items">
+          <li>LiquidETFUniverseSelector</li>
+          <li>Black-Litterman construction</li>
+          <li>ConfidenceWeighted allocation</li>
+          <li>TimescaleDB continuous aggregates</li>
+          <li>Wire UnifiedPortfolioRisk (HI-1)</li>
+        </ul>
+      </div>
+      <div class="phase ph-3">
+        <div class="phase-num">03</div>
+        <div class="phase-name">APEX Core Features</div>
+        <div class="phase-time">~2 weeks</div>
+        <ul class="phase-items">
+          <li>VWAP execution model</li>
+          <li>Signal Provider FastAPI</li>
+          <li>Signal Analyst LLM Agent</li>
+          <li>Walk-Forward Reviewer + PDF</li>
+          <li>Grafana ensemble breakdown</li>
+        </ul>
+      </div>
+      <div class="phase ph-4">
+        <div class="phase-num">04</div>
+        <div class="phase-name">Production Hardening</div>
+        <div class="phase-time">~1 week</div>
+        <ul class="phase-items">
+          <li>Kafka retention limits (MD-1)</li>
+          <li>TimescaleDB retention (MD-2)</li>
+          <li>Schema Registry cache (MD-5)</li>
+          <li>DLQ persist + backoff (HI-7)</li>
+          <li>CI pipeline: yamllint + pytest</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">APEX</div>
+    <div class="footer-meta">
+      AWET-main · Unified Trading Platform · QuantConnect Lean · Blueprint 2026<br>
+      For paper trading only. Not financial advice.
+    </div>
+  </footer>
+
+</div><!-- /wrap -->
+</body>
+</html>

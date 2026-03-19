@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unified Trading Platform · LLM Prompt Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --bg2: #ede8df;
+    --surface: #faf7f2;
+    --border: #ddd6c8;
+    --border-dark: #bfb5a4;
+    --text: #2a2520;
+    --text-mid: #6b5f52;
+    --text-dim: #9e9186;
+    --accent: #c1440e;       /* terracotta */
+    --accent2: #2b6cb0;      /* steel blue */
+    --accent3: #2d6a4f;      /* forest */
+    --accent4: #7b3fa0;      /* purple */
+    --accent5: #b7791f;      /* amber */
+    --critical: #9b1c1c;
+
+    --layer-directive: #2b6cb0;
+    --layer-orchestration: #c1440e;
+    --layer-signal: #2d6a4f;
+    --layer-risk: #7b3fa0;
+    --layer-debug: #b7791f;
+    --layer-hardening: #9b1c1c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+  }
+
+  /* Subtle paper texture via repeating gradient */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.6;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+
+  /* ── HEADER ── */
+  header {
+    padding: 52px 0 36px;
+    border-bottom: 2px solid var(--border-dark);
+  }
+  .header-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+  
+  .eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--accent); opacity: 0.3; }
+
+  h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(32px, 5vw, 54px);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .subtitle {
+    margin-top: 10px; font-size: 11.5px; color: var(--text-mid); line-height: 1.7; max-width: 520px;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; }
+  .version-tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    border: 1.5px solid var(--accent); color: var(--accent); padding: 4px 12px;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .stats { display: flex; gap: 28px; }
+  .stat-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 40px; color: var(--text); line-height: 1;
+  }
+  .stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Space Grotesk', sans-serif; margin-top: 2px; }
+
+  /* ── FILTERS ── */
+  .filters {
+    padding: 16px 0;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--bg);
+    z-index: 20;
+    backdrop-filter: blur(4px);
+  }
+  .filter-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .filter-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim);
+    margin-right: 2px;
+  }
+  .filter-btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; font-weight: 500;
+    background: transparent;
+    border: 1px solid var(--border-dark);
+    color: var(--text-mid);
+    padding: 5px 13px;
+    cursor: pointer;
+    transition: all 0.12s;
+    letter-spacing: 0.02em;
+  }
+  .filter-btn:hover { border-color: var(--text-mid); color: var(--text); }
+  .filter-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .filter-btn[data-filter="hardening"].active { background: var(--critical); border-color: var(--critical); }
+  .filter-btn[data-filter="signal"].active { background: var(--accent3); border-color: var(--accent3); }
+  .filter-btn[data-filter="risk"].active { background: var(--accent4); border-color: var(--accent4); }
+  .filter-btn[data-filter="directive"].active { background: var(--accent2); border-color: var(--accent2); }
+  .filter-btn[data-filter="orchestration"].active { background: var(--accent); border-color: var(--accent); }
+  .filter-btn[data-filter="debug"].active { background: var(--accent5); border-color: var(--accent5); }
+
+  .search-wrap { margin-left: auto; position: relative; }
+  .search-wrap::before {
+    content: '⌕'; position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text-dim); font-size: 15px; pointer-events: none;
+  }
+  .search {
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    background: var(--surface);
+    border: 1px solid var(--border-dark);
+    color: var(--text);
+    padding: 7px 12px 7px 32px;
+    width: 230px; outline: none;
+    transition: border-color 0.12s;
+  }
+  .search:focus { border-color: var(--accent); }
+  .search::placeholder { color: var(--text-dim); }
+
+  /* ── GRID ── */
+  .grid {
+    padding: 28px 0 72px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 18px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    position: relative;
+    display: flex; flex-direction: column;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    animation: fadeIn 0.35s ease both;
+    overflow: hidden;
+  }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+  .card:hover {
+    border-color: var(--border-dark);
+    box-shadow: 4px 4px 0 var(--border);
+    transform: translate(-2px, -2px);
+  }
+
+  .card-stripe { height: 3px; width: 100%; }
+
+  .card-head { padding: 18px 20px 12px; }
+  .card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+
+  .card-layer {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 3px 9px; border: 1px solid;
+  }
+  .card-difficulty {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; color: var(--text-dim);
+  }
+
+  .card-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px; font-weight: 400; color: var(--text); line-height: 1.25;
+    margin-bottom: 6px;
+  }
+  .card-desc {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11.5px; color: var(--text-mid); line-height: 1.6;
+  }
+
+  .card-tags { padding: 0 20px 12px; display: flex; gap: 5px; flex-wrap: wrap; }
+  .tag {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; color: var(--text-dim);
+    background: var(--bg2); border: 1px solid var(--border);
+    padding: 2px 8px; letter-spacing: 0.03em;
+  }
+  .tag.new {
+    background: #f0fff4; border-color: var(--accent3); color: var(--accent3);
+  }
+  .tag.critical {
+    background: #fff5f5; border-color: var(--critical); color: var(--critical);
+  }
+
+  /* Prompt box */
+  .card-body { padding: 0 20px 12px; flex: 1; }
+  .prompt-wrap { position: relative; }
+  .prompt-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border-dark);
+    padding: 14px 16px;
+    font-size: 11px;
+    line-height: 1.8;
+    color: var(--text-mid);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 155px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .prompt-box.expanded { max-height: 700px; }
+  .prompt-box .var { color: var(--accent); font-style: italic; }
+  .prompt-box .kw { color: var(--accent2); font-weight: 500; }
+  .prompt-box .hi { color: var(--accent3); font-weight: 500; }
+  .prompt-box .warn { color: var(--critical); font-weight: 600; }
+  .prompt-box .comment { color: var(--text-dim); }
+  .fade-out {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 44px;
+    background: linear-gradient(transparent, var(--bg2));
+    pointer-events: none; transition: opacity 0.25s;
+  }
+  .expanded ~ .fade-out { opacity: 0; }
+
+  /* Footer */
+  .card-foot {
+    padding: 10px 20px 16px;
+    display: flex; gap: 8px;
+    border-top: 1px solid var(--border); margin-top: auto;
+  }
+  .btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 6px 16px; cursor: pointer; border: 1.5px solid;
+    transition: all 0.12s; background: transparent;
+  }
+  .btn-copy { border-color: var(--accent); color: var(--accent); }
+  .btn-copy:hover, .btn-copy.copied { background: var(--accent); color: #fff; }
+  .btn-expand { border-color: var(--border-dark); color: var(--text-dim); }
+  .btn-expand:hover { border-color: var(--text-mid); color: var(--text); }
+
+  /* Empty state */
+  .empty { grid-column: 1/-1; text-align: center; padding: 72px 24px; color: var(--text-dim); }
+  .empty-icon { font-family: 'Instrument Serif', serif; font-size: 48px; color: var(--border-dark); margin-bottom: 12px; }
+  .empty p { font-family: 'Space Grotesk', sans-serif; font-size: 14px; }
+
+  /* Layer color helpers */
+  .s-directive   { background: var(--layer-directive);    }
+  .s-orchestration { background: var(--accent);           }
+  .s-signal      { background: var(--accent3);            }
+  .s-risk        { background: var(--accent4);            }
+  .s-debug       { background: var(--accent5);            }
+  .s-hardening   { background: var(--critical);           }
+
+  .l-directive   { color: var(--layer-directive);   border-color: var(--layer-directive);   }
+  .l-orchestration { color: var(--accent);          border-color: var(--accent);            }
+  .l-signal      { color: var(--accent3);           border-color: var(--accent3);           }
+  .l-risk        { color: var(--accent4);           border-color: var(--accent4);           }
+  .l-debug       { color: var(--accent5);           border-color: var(--accent5);           }
+  .l-hardening   { color: var(--critical);          border-color: var(--critical);          }
+
+  .left-bar-directive   { border-left-color: var(--layer-directive) !important; }
+  .left-bar-orchestration { border-left-color: var(--accent) !important; }
+  .left-bar-signal      { border-left-color: var(--accent3) !important; }
+  .left-bar-risk        { border-left-color: var(--accent4) !important; }
+  .left-bar-debug       { border-left-color: var(--accent5) !important; }
+  .left-bar-hardening   { border-left-color: var(--critical) !important; }
+
+  /* New badge */
+  .new-badge {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    background: var(--accent3); color: #fff; padding: 2px 6px; margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* Section divider */
+  .section-divider {
+    grid-column: 1/-1;
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px; color: var(--text-mid);
+    padding: 8px 0 4px;
+  }
+  .section-divider::before { content: ''; flex: none; width: 24px; height: 1px; background: var(--border-dark); }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-inner">
+      <div>
+        <div class="eyebrow">Unified Trading Platform &nbsp;·&nbsp; v2</div>
+        <h1>LLM <em>Orchestration</em><br>Prompt Library</h1>
+        <p class="subtitle">
+          Production prompts for all 12 services — from data ingestion to exit monitoring.
+          Covers AWET core + Lean Alpha integration, walk-forward validation, ensemble signals, CVaR risk, and hardening fixes.
+        </p>
+      </div>
+      <div class="header-right">
+        <div class="version-tag">↑ from AWET-main</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-num" id="visible-count">0</div>
+            <div class="stat-label">Shown</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" id="total-count">0</div>
+            <div class="stat-label">Total</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="filters">
+    <span class="filter-label">Layer:</span>
+    <div class="filter-group">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="directive">Directive</button>
+      <button class="filter-btn" data-filter="orchestration">Orchestration</button>
+      <button class="filter-btn" data-filter="signal">Signal</button>
+      <button class="filter-btn" data-filter="risk">Risk</button>
+      <button class="filter-btn" data-filter="debug">Debug</button>
+      <button class="filter-btn" data-filter="hardening">⚠ Hardening</button>
+    </div>
+    <div class="search-wrap">
+      <input class="search" type="text" placeholder="Search prompts…" id="search-input">
+    </div>
+  </div>
+
+  <div class="grid" id="prompt-grid"></div>
+
+</div>
+
+<script>
+const P = [
+
+  // ── DIRECTIVE ─────────────────────────────────────────────────────────────
+  {
+    id: 1, layer:"directive", isNew:false,
+    title: "Read & Validate a Directive",
+    desc: "Load an SOP directive file and verify all required fields before any execution.",
+    difficulty: "★☆☆",
+    tags: ["directives/", "SOP", "pre-flight"],
+    prompt: `You are the Layer 2 Orchestrator for the Unified Trading Platform.
+
+# TASK
+Read the directive at <span class="var">directives/{DIRECTIVE_FILE}</span> and validate it before execution.
+
+# VALIDATION CHECKLIST
+Confirm the directive contains ALL of:
+- <span class="var">Goal</span> + success criteria
+- <span class="var">Inputs</span> (symbols, time range, configs)
+- <span class="var">Tools/Services</span> to call (scripts/ or HTTP endpoints)
+- <span class="var">Outputs</span> (Kafka topics, DB tables, artifacts)
+- <span class="var">Edge cases</span> + rollback/replay steps
+
+# OUTPUT FORMAT
+<span class="comment"># Validation Report</span>
+status: PASS | FAIL
+missing_fields: [...]
+risks: [...]
+recommended_first_action: "..."
+
+<span class="warn">Do NOT execute anything. Only validate and report.</span>`
+  },
+  {
+    id: 2, layer:"directive", isNew:false,
+    title: "Write a New Directive from Goal",
+    desc: "Generates a complete directive Markdown SOP from a plain-English trading goal.",
+    difficulty: "★★☆",
+    tags: ["directives/", "authoring", "SOP"],
+    prompt: `You are writing a new Unified Platform directive. Use the template structure exactly.
+
+# USER GOAL
+<span class="var">{PLAIN_ENGLISH_GOAL}</span>
+
+# DIRECTIVE TEMPLATE
+\`\`\`markdown
+## Goal
+## Success Criteria
+## Inputs
+## Tools/Services
+## Outputs
+## Steps
+## Edge Cases
+## Rollback/Replay
+\`\`\`
+
+# RULES
+- Steps must call ONLY: scripts/, Tool Gateway HTTP endpoints, or docker compose run
+- No streaming loops inside the orchestrator
+- No direct trade placement — use awet_approve_execution
+- Every step must reference <span class="var">correlation_id</span>
+- Edge cases must include: Kafka lag, DB unavailable, model not found, Redis failure
+- If the directive involves model training, note embargo_bars requirement (CF-2 fix)
+
+Output the completed directive as a Markdown code block.`
+  },
+
+  // ── ORCHESTRATION ─────────────────────────────────────────────────────────
+  {
+    id: 3, layer:"orchestration", isNew:false,
+    title: "Full Pipeline Orchestration",
+    desc: "End-to-end coordination across all 12 services with Avro schema validation and audit trail.",
+    difficulty: "★★★",
+    tags: ["pipeline", "e2e", "audit", "correlation_id"],
+    prompt: `You are the Unified Trading Platform Orchestrator. Execute the full pipeline.
+
+# CONFIG
+- Symbols: <span class="var">{SYMBOLS}</span>
+- Date range: <span class="var">{START_DATE}</span> → <span class="var">{END_DATE}</span>
+- correlation_id: <span class="var">{CORRELATION_ID}</span>
+
+# PIPELINE STAGES (execute in order, pass correlation_id to each)
+1. <span class="kw">ingest</span>        → DataIngestionService :8001
+2. <span class="kw">engineer</span>      → FeatureEngineeringService :8002
+3. <span class="kw">tft_infer</span>     → ModelInferenceService :8003
+4. <span class="kw">lean_alpha</span>    → LeanAlphaService :8014  <span class="comment">(RSI/EMA/MACD → alpha.signals)</span>
+5. <span class="kw">ensemble</span>      → SignalEngineService :8015 <span class="comment">(→ signals.scored)</span>
+6. <span class="kw">risk</span>          → RiskEngineService :8004
+7. <span class="kw">execute</span>       → ExecutionService :8005  <span class="comment">(paper only, requires approval gate)</span>
+8. <span class="kw">exit_monitor</span>  → ExitMonitorService (trailing stops, TP/SL)
+
+# RULES
+- Verify audit_trail row for each stage before proceeding
+- <span class="warn">If kill_switch_active = 1 in Redis: HALT immediately, do not proceed past risk</span>
+- Paper endpoint only: https://paper-api.alpaca.markets
+- On any stage failure: call awet_revoke_execution, log to audit_trail
+
+# OUTPUT (per stage)
+{ stage, status, duration_ms, audit_id, kafka_topic_out, notes }`
+  },
+  {
+    id: 4, layer:"orchestration", isNew:false,
+    title: "Morning Deployer Routine",
+    desc: "Pre-market agent sequence: health checks, walk-forward model validation, promotion gate.",
+    difficulty: "★★☆",
+    tags: ["morning", "deployer", "health-check", "model-promotion"],
+    prompt: `You are the Morning Deployer (runs at 08:30). Market opens soon. Run pre-market setup.
+
+# SEQUENCE
+1. awet_check_pipeline_health — <span class="warn">abort if any of 13 services is non-healthy</span>
+2. awet_check_kafka_lag — flag if lag > <span class="var">{MAX_LAG_SECONDS}</span>s on any topic
+3. Verify Redis is reachable: GET kill_switch_active — if 1, abort
+4. Check last night's walk-forward training:
+   SELECT * FROM model_runs ORDER BY created_at DESC LIMIT 1
+   Required: status='completed', median_oos_sharpe ≥ 0.5
+   <span class="comment">(Note: OOS Sharpe uses annualization √(252×390) for minute bars)</span>
+5. If valid → awet_promote_model (promotes LATEST fold, not best fold — CF-1 fix)
+6. Verify MLflow experiment has logged run for model_id
+7. Set approval gate: touch .tmp/APPROVE_EXECUTION
+
+# ABORT CONDITIONS
+- Any service unhealthy
+- kill_switch_active = 1
+- median_oos_sharpe < 0.5 across all folds
+- Redis unreachable (CF-6: do not start without Redis confirmation)
+
+Report: { ready: bool, blockers: [], model_id, model_promoted: bool, gate_set: bool }`
+  },
+  {
+    id: 5, layer:"orchestration", isNew:false,
+    title: "Night Trainer Agent",
+    desc: "Overnight walk-forward TFT retraining with MLflow tracking and fold embargo enforcement.",
+    difficulty: "★★★",
+    tags: ["night-trainer", "TFT", "walk-forward", "MLflow"],
+    prompt: `You are the Night Trainer (runs at 02:00). Run overnight model training.
+
+# SEQUENCE
+1. Backfill: DataIngestionService backfill endpoint for <span class="var">{SYMBOLS}</span>, last 7 days
+2. Feature engineering: FeatureEngineeringService :8002/trigger
+
+3. Walk-forward training:
+   docker compose run --profile training model-training python train.py \
+     --walk-forward --min-folds 6 --bars-per-day 390
+
+   <span class="comment"># CF-3 fix: bars_per_day=390 → annualization = √(252×390) ≈ 313.5</span>
+   <span class="comment"># CF-2 fix: embargo_bars = lookback_window + max(horizons) = 180</span>
+
+4. Selection: use LATEST fold (highest fold_number), NOT highest OOS Sharpe
+   <span class="comment"># CF-1 fix: avoid selection bias</span>
+
+5. Quality gate:
+   - median OOS Sharpe across all folds ≥ 0.5
+   - If gate passes → tag model as 'candidate' in model_runs
+   - If gate fails → tag 'rejected', retain previous model
+
+6. Persist normalization stats:
+   <span class="comment"># CF-4 fix: save mean/std per feature as JSON sidecar alongside ONNX artifact</span>
+
+7. Log to MLflow: val_loss per epoch, OOS Sharpe per fold, artifact_path
+
+Report: { folds_run, median_oos_sharpe, model_id, candidate: bool, artifact_path }`
+  },
+  {
+    id: 6, layer:"orchestration", isNew:false,
+    title: "Trade Watchdog (Intraday)",
+    desc: "15-minute polling: monitors all 11 Prometheus alert rules and enforces circuit-breaker logic.",
+    difficulty: "★★★",
+    tags: ["watchdog", "intraday", "circuit-breaker", "prometheus"],
+    prompt: `You are the Trade Watchdog. It is <span class="var">{CURRENT_TIME}</span> during market hours. Run 15-min check.
+
+# CHECKS
+1. awet_check_pipeline_health → all 13 services GREEN
+2. awet_check_kafka_lag → ConsumerLagHigh: lag > 100 / ConsumerLagCritical: lag > 1000
+3. Redis: GET kill_switch_active → if 1, halt immediately
+4. Recent predictions: SELECT FROM predictions WHERE created_at > NOW() - '15 min'
+5. Grafana metrics check:
+   - daily_pnl_usd → if < -<span class="var">{MAX_DAILY_LOSS_USD}</span>: trigger kill switch
+   - position_count → verify against limits.yaml
+   - model_confidence_score histogram → if p50 < <span class="var">{MIN_CONFIDENCE}</span> for 3 windows: flag
+
+# CIRCUIT BREAKER (revoke gate + SET kill_switch in Redis if ANY):
+- Portfolio drawdown > <span class="var">{MAX_DRAWDOWN_PCT}</span>% from open
+- Single position > 2% of portfolio (limits.yaml)
+- Sector exposure > 30%
+- Kafka lag > 1000 on predictions.tft or signals.scored
+- <span class="warn">kill_switch_active already set by RiskEngine — do NOT override with False</span>
+
+# OUTPUT
+{ timestamp, all_green: bool, circuit_breaker_triggered: bool, reason: null|str, prometheus_alerts_firing: [] }`
+  },
+
+  // ── SIGNAL ────────────────────────────────────────────────────────────────
+  {
+    id: 7, layer:"signal", isNew:true,
+    title: "Ensemble Signal Evaluation",
+    desc: "Interprets a signals.scored event — weighted TFT + RSI + EMA + MACD vote with Platt calibration.",
+    difficulty: "★★☆",
+    tags: ["signal-engine", "ensemble", "TFT", "lean-alpha"],
+    prompt: `You are reviewing a scored signal from SignalEngineService (:8015).
+
+# SIGNAL EVENT (signals.scored Avro schema)
+{
+  correlation_id: "<span class="var">{CORRELATION_ID}</span>",
+  symbol: "<span class="var">{SYMBOL}</span>",
+  tft_direction: "<span class="var">{UP|DOWN|NEUTRAL}</span>",   tft_confidence: <span class="var">{FLOAT}</span>,
+  rsi_signal: "<span class="var">{UP|DOWN|NEUTRAL}</span>",
+  ema_signal: "<span class="var">{UP|DOWN|NEUTRAL}</span>",
+  macd_signal: "<span class="var">{UP|DOWN|NEUTRAL}</span>",
+  ensemble_score: <span class="var">{FLOAT}</span>,              <span class="comment">// TFT×0.5 + RSI×0.2 + EMA×0.2 + MACD×0.1</span>
+  calibrated_confidence: <span class="var">{FLOAT}</span>,       <span class="comment">// Platt scaled</span>
+  regime_filter_pass: <span class="var">{BOOL}</span>
+}
+
+# EVALUATION LOGIC
+1. If regime_filter_pass = false → <span class="warn">REJECT regardless of score</span>
+2. If calibrated_confidence < <span class="var">{MIN_CONFIDENCE}</span> → REJECT
+3. Score thresholds:
+   - ensemble_score > 0.65 → STRONG signal
+   - 0.5–0.65 → MODERATE signal  
+   - < 0.5 → WEAK / reject
+4. Check for disagreement: if TFT says UP but RSI + EMA both say DOWN → flag CONFLICTED
+
+# OUTPUT
+{ decision: APPROVE|REJECT|HOLD, strength: STRONG|MODERATE|WEAK, conflict_flag: bool, reasoning: str }`
+  },
+  {
+    id: 8, layer:"signal", isNew:true,
+    title: "Lean Alpha Diagnostics",
+    desc: "Debug RSI, EMA-cross, and MACD alpha model outputs from the LeanAlphaService.",
+    difficulty: "★★☆",
+    tags: ["lean-alpha", "RSI", "EMA", "MACD", "debug"],
+    prompt: `You are diagnosing why LeanAlphaService (:8014) is producing unexpected signals.
+
+# DIAGNOSTIC STEPS
+1. Query recent alpha.signals events for <span class="var">{SYMBOL}</span>:
+   SELECT indicator, direction, raw_value, ts
+   FROM signals WHERE symbol='<span class="var">{SYMBOL}</span>' ORDER BY ts DESC LIMIT 50
+
+2. For each indicator, verify expected behavior:
+   - <span class="kw">RSI-14</span>: raw_value > 70 → DOWN (overbought), < 30 → UP (oversold), else NEUTRAL
+   - <span class="kw">EMA-cross(12,26)</span>: fast crosses above slow → UP, below → DOWN, else NEUTRAL
+   - <span class="kw">MACD(12,26,9)</span>: MACD line crosses above signal line → UP, else DOWN
+
+3. Check for warmup period issues:
+   - RSI needs ≥ 14 bars to emit (else NEUTRAL is correct)
+   - EMA(26) needs ≥ 26 bars
+   - MACD signal line needs ≥ 9 additional bars after MACD warms up
+
+4. Verify Kafka delivery: check alpha.signals topic consumer lag for signal_engine group
+
+# OUTPUT
+{ indicator, expected_behavior: str, actual_output: str, anomaly: bool, likely_cause: str }`
+  },
+  {
+    id: 9, layer:"signal", isNew:true,
+    title: "Recalibrate Platt Scaler",
+    desc: "Prompts refit of confidence calibration using recent validation outcomes from model_runs.",
+    difficulty: "★★★",
+    tags: ["platt-calibration", "signal-engine", "confidence"],
+    prompt: `You are recalibrating the PlattScaler in SignalEngineService (:8015).
+
+# WHEN TO RECALIBRATE
+Trigger if any of:
+- Calibrated confidence is systematically > 0.8 on incorrect predictions
+- Walk-forward completed a new training run (new model_id)
+- > 500 new validation outcomes available since last fit
+
+# STEPS
+1. Query validation data:
+   SELECT raw_confidence, was_correct FROM prediction_outcomes
+   WHERE model_id = '<span class="var">{MODEL_ID}</span>'
+   AND created_at > NOW() - INTERVAL '<span class="var">{LOOKBACK_DAYS}</span> days'
+   ORDER BY created_at
+
+   Require ≥ 200 rows. If not enough data: <span class="warn">do NOT refit, return { skipped: true }</span>
+
+2. Split: first 80% for fit, last 20% for validation
+3. Call PlattScaler.fit(scores, labels) — Newton's method, max_iter=100
+4. Validate: fitted P(correct | score) should approximate observed accuracy in bins
+5. Save A, B params to Redis: SET platt_scaler:<span class="var">{MODEL_ID}</span> '{"A": ..., "B": ...}'
+6. Reload SignalEngineService: POST :8015/reload_calibration
+
+# OUTPUT
+{ refitted: bool, new_A: float, new_B: float, validation_brier_score: float, prev_brier_score: float }`
+  },
+
+  // ── RISK ──────────────────────────────────────────────────────────────────
+  {
+    id: 10, layer:"risk", isNew:true,
+    title: "CVaR-95 Risk Gate Evaluation",
+    desc: "Evaluates a trade using real CVaR-95 from historical returns (CF-5 hardened).",
+    difficulty: "★★★",
+    tags: ["CVaR", "risk-engine", "position-sizing", "CF-5"],
+    prompt: `You are evaluating a trade through the RiskEngine (:8004). Use real CVaR-95.
+
+# TRADE REQUEST (RiskInput schema)
+{
+  symbol: "<span class="var">{SYMBOL}</span>",
+  price: <span class="var">{PRICE}</span>,
+  direction: "<span class="var">{UP|DOWN}</span>",
+  confidence: <span class="var">{CALIBRATED_CONFIDENCE}</span>,
+  horizon_30_q10: <span class="var">{Q10}</span>, q50: <span class="var">{Q50}</span>, q90: <span class="var">{Q90}</span>,
+  volatility_5: <span class="var">{VOL5}</span>, volatility_15: <span class="var">{VOL15}</span>,
+  portfolio_value: <span class="var">{PORTFOLIO_VALUE}</span>,
+  daily_pnl: <span class="var">{DAILY_PNL}</span>,
+  return_history: [<span class="var">{250_BARS_OF_RETURNS}</span>]
+}
+
+# RISK CHECKS (all must pass)
+□ kill_switch_active = 0 (check Redis — fail safe: reject if Redis unreachable)
+□ daily_pnl / portfolio_value > -0.05  (5% daily loss limit)
+□ CVaR-95: mean(returns[returns < np.percentile(returns, 5)])
+  → if |CVaR| * proposed_size > <span class="var">{MAX_CVAR_LOSS_USD}</span>: <span class="warn">REJECT</span>
+  → fallback if len(return_history) < 250: parametric CVaR = σ × φ(z₀.₀₅) / 0.05
+□ Position size ≤ 2% of portfolio_value
+□ Sector exposure ≤ 30% after this trade
+□ volatility_5 within normal range (reject extreme volatility)
+
+# OUTPUT (RiskOutput schema)
+{ decision: APPROVED|REJECTED|PENDING_REVIEW, reasons: [], approved_size: float, risk_score: float, cvar_95: float }`
+  },
+  {
+    id: 11, layer:"risk", isNew:true,
+    title: "Kill Switch Management",
+    desc: "Safely activates or deactivates the kill switch with Redis persistence and audit logging.",
+    difficulty: "★★☆",
+    tags: ["kill-switch", "risk-engine", "Redis", "emergency"],
+    prompt: `You are managing the RiskEngine kill switch.
+
+# ACTIVATE KILL SWITCH
+Trigger conditions (any of):
+- kill_switch_active Prometheus alert fires
+- Daily drawdown > 10% of portfolio (hard limit)
+- Manual operator override
+- <span class="warn">CF-6: Redis failure — fail CLOSED: treat as kill switch = ON</span>
+
+Steps to activate:
+1. SET kill_switch_active 1 EX 86400 in Redis (24h TTL for safety)
+2. Call awet_revoke_execution (remove .tmp/APPROVE_EXECUTION)
+3. POST :8004/kill_switch { active: true, reason: "<span class="var">{REASON}</span>", operator: "<span class="var">{OPERATOR}</span>" }
+4. Log to audit_trail: { event: 'kill_switch_activated', correlation_id, reason, daily_pnl }
+5. Fire Telegram alert: severity CRITICAL
+
+# DEACTIVATE KILL SWITCH
+<span class="warn">Manual operator action only. Never auto-deactivate.</span>
+Require: operator_signature + reason + POST :8004/kill_switch { active: false }
+Then: verify Redis updated, re-run Morning Deployer health sequence before setting approval gate.
+
+# OUTPUT
+{ action: ACTIVATED|DEACTIVATED, redis_confirmed: bool, audit_id, alert_sent: bool }`
+  },
+  {
+    id: 12, layer:"risk", isNew:true,
+    title: "Execution Approval Gate (Triple Safety)",
+    desc: "Full triple safety gate: paper-API check, Redis kill switch, risk limits, and audit.",
+    difficulty: "★★☆",
+    tags: ["execution", "safety-gate", "paper-only", "triple-safety"],
+    prompt: `You are setting the AWET execution approval gate. All three safety gates must pass.
+
+# GATE 1 — Infrastructure
+□ awet_check_pipeline_health → all 13 services GREEN
+□ Redis reachable + kill_switch_active = 0
+□ Kafka lag < 100s on all topics
+
+# GATE 2 — Paper Trading Safety
+□ ALPACA_BASE_URL = https://paper-api.alpaca.markets (verify in .env — NEVER live URL)
+□ Bracket orders configured: TP 3%, SL 1.5%
+□ Throttle limits: 5 orders/min, 3/symbol/day
+□ Exposure caps: $50k total, $10k/symbol
+
+# GATE 3 — Model & Signal Quality
+□ Active model has median_oos_sharpe ≥ 0.5 (check model_runs)
+□ Platt scaler loaded for current model_id in Redis
+□ Feature normalization stats JSON sidecar exists alongside ONNX artifact <span class="comment">(CF-4)</span>
+□ No PipelineStale alert currently firing (Prometheus :9090)
+
+# IF ALL PASS
+Action: touch .tmp/APPROVE_EXECUTION
+Log to audit_trail: { stage: 'execution_approved', correlation_id: "<span class="var">{CORRELATION_ID}</span>", gates_passed: 3 }
+
+Output: { approved: bool, gates: { infra: bool, paper: bool, quality: bool }, audit_id }`
+  },
+
+  // ── DEBUG ─────────────────────────────────────────────────────────────────
+  {
+    id: 13, layer:"debug", isNew:false,
+    title: "Explain a Pipeline Run",
+    desc: "Generates a human-readable audit narrative from structlog traces and audit_trail.",
+    difficulty: "★☆☆",
+    tags: ["audit", "structlog", "explain", "correlation_id"],
+    prompt: `You are auditing a Unified Platform pipeline run. Generate a plain-English explanation.
+
+# INPUT
+correlation_id: <span class="var">{CORRELATION_ID}</span>
+
+# STEPS
+1. Query audit_trail WHERE correlation_id = '<span class="var">{CORRELATION_ID}</span>' ORDER BY created_at
+2. Query llm_traces WHERE correlation_id = '<span class="var">{CORRELATION_ID}</span>' ORDER BY created_at
+3. Query structlog (or log file) grep for correlation_id — check for any ERROR or WARNING events
+
+# OUTPUT FORMAT
+## Run Summary
+Start / End / Duration | Symbols | Final status: SUCCESS|PARTIAL|FAILED
+
+## Stage Timeline
+| Stage | Status | Duration | Kafka Topic Out | Notes |
+
+## Signal Breakdown (if applicable)
+TFT: {dir} ({conf}) | RSI: {dir} | EMA: {dir} | MACD: {dir}
+Ensemble score: {score} | Calibrated: {cal} | Regime: {pass/fail}
+
+## Risk Decision
+CVaR-95: {val} | Approved size: {size} | Reasons: [...]
+
+## Anomalies
+(Any circuit-breaker triggers, missing audit rows, Redis failures, LLM retries)
+
+Write for a non-technical stakeholder. Factual and concise.`
+  },
+  {
+    id: 14, layer:"debug", isNew:false,
+    title: "Diagnose Kafka Lag",
+    desc: "Investigate and triage consumer lag across all 8 Unified Platform Kafka topics.",
+    difficulty: "★★☆",
+    tags: ["kafka", "lag", "triage", "ops", "ConsumerLagHigh"],
+    prompt: `AWET has reported Kafka consumer lag. Investigate and triage.
+
+# TOPICS TO CHECK
+market.raw | market.engineered | alpha.signals (NEW) | predictions.tft
+signals.scored (NEW) | risk.approved | risk.rejected | execution.completed
+
+# STEPS
+1. awet_check_kafka_lag → lag per topic per partition
+2. Classify by Prometheus alert thresholds:
+   - <span class="hi">WARNING</span>: lag > 100 for 5 min (ConsumerLagHigh)
+   - <span class="warn">CRITICAL</span>: lag > 1000 for 2 min (ConsumerLagCritical)
+3. For lagging topics, check:
+   - Is upstream producer running? (docker compose ps)
+   - Is consumer group registered? (kafka consumer-groups.sh --describe)
+   - Any Avro schema validation errors in structlog for that topic?
+4. Special case: alpha.signals lag → LeanAlphaService (:8014) may be in warmup
+   (needs ≥ 26 bars before EMA emits — this is expected, not a bug)
+
+# PAUSE EXECUTION if signals.scored lag > 1000 (signal engine is blocked)
+
+Output: { topics_lagging: [], severity: WARNING|CRITICAL, root_cause, recommended_action }`
+  },
+  {
+    id: 15, layer:"debug", isNew:false,
+    title: "LLM Trace & Performance Analysis",
+    desc: "Analyzes LLM traces for latency, token cost, failed decisions, and agent health.",
+    difficulty: "★★☆",
+    tags: ["llm-trace", "performance", "observability", "MLflow"],
+    prompt: `Analyze Unified Platform LLM traces to find performance and quality issues.
+
+# DATA SOURCE
+SELECT agent, model, latency_ms, token_count, created_at, request_preview, response_preview
+FROM llm_traces
+WHERE created_at > NOW() - INTERVAL '<span class="var">{LOOKBACK_HOURS}</span> hours'
+ORDER BY latency_ms DESC
+
+Also check MLflow: GET http://localhost:5000/api/2.0/mlflow/runs/search
+for any runs with status=FAILED or missing walk_forward metrics
+
+# ANALYSIS
+1. <span class="kw">Latency outliers</span>: calls where latency_ms > <span class="var">{P95_MS}</span>
+2. <span class="kw">Token cost</span>: avg tokens per agent — flag agents using > 2x median
+3. <span class="kw">Failures</span>: response_preview containing ERROR, null JSON, or schema mismatch
+4. <span class="kw">Model check</span>: all calls should use model from config/llm.yaml (qwen2.5:32b or configured)
+5. <span class="kw">Dead agents</span>: any service with 0 LLM calls in window (expected: signal_engine, lean_alpha use no LLM)
+6. <span class="kw">MLflow gaps</span>: walk-forward runs without OOS Sharpe logged
+
+Output: markdown table + 3-sentence summary of top issue.`
+  },
+  {
+    id: 16, layer:"debug", isNew:true,
+    title: "Backtest Report Validation",
+    desc: "Validates backtest metrics output from BacktesterService, including correct minute-bar annualization.",
+    difficulty: "★★☆",
+    tags: ["backtester", "metrics", "Sharpe", "CF-3", "validation"],
+    prompt: `You are validating a BacktesterService (:8012) report for <span class="var">{STRATEGY_NAME}</span>.
+
+# REQUIRED METRICS (from metrics.py)
+Sharpe | Sortino | Calmar | Alpha | Beta | Information Ratio | Profit Factor | Max DD Duration
+
+# VALIDATION CHECKS
+1. <span class="kw">Annualization factor</span>:
+   If data is minute bars: annualization = √(252 × 390) ≈ 313.5
+   If daily bars: annualization = √252 ≈ 15.87
+   <span class="warn">CF-3 fix: if the report uses √252 on minute data, Sharpe is understated by ~20×</span>
+   Verify: SELECT bar_frequency FROM backtest_runs WHERE id='<span class="var">{RUN_ID}</span>'
+
+2. <span class="kw">Sharpe sanity</span>:
+   - < 0: strategy loses money risk-adjusted — review immediately
+   - 0–0.5: below gate, do NOT deploy
+   - 0.5–1.0: acceptable for paper trading
+   - > 2.0: verify no look-ahead bias
+
+3. <span class="kw">Max drawdown duration</span>: if > 60 trading days, flag for review
+4. <span class="kw">Profit factor</span>: should be > 1.0 (gross profit / gross loss)
+5. <span class="kw">Walk-forward OOS vs backtest</span>: OOS Sharpe should be within 40% of in-sample
+
+Output: { metrics_valid: bool, annualization_correct: bool, flags: [], recommendation: DEPLOY|REVIEW|REJECT }`
+  },
+
+  // ── HARDENING ─────────────────────────────────────────────────────────────
+  {
+    id: 17, layer:"hardening", isNew:true,
+    title: "Fix CF-1: Walk-Forward Selection Bias",
+    desc: "Patches select_best() to return the most recent fold (highest fold_number), not the lucky one.",
+    difficulty: "★★☆",
+    tags: ["CF-1", "walk_forward.py", "selection-bias", "CRITICAL"],
+    prompt: `Fix CRITICAL bug CF-1 in walk_forward.py.
+
+# BUG
+File: services/model_training/walk_forward.py, line 301–302
+select_best() picks the fold with highest OOS Sharpe → selection bias (deploying the lucky fold).
+
+# FIX SPECIFICATION
+Change: select_best() returns fold with highest fold_number (most recent data)
+Preserve: median OOS Sharpe across all folds as the quality gate
+Log (don't use for selection): best-fold Sharpe for observability
+
+# IMPLEMENTATION
+\`\`\`python
+def select_best(self, folds: list[FoldResult]) -> FoldResult:
+    <span class="comment"># CF-1 fix: select most recent fold, not highest OOS Sharpe</span>
+    if not folds:
+        raise ValueError("No folds to select from")
+    
+    selected = max(folds, key=lambda f: f.fold_number)
+    
+    <span class="comment"># Log for observability only — do NOT use for selection</span>
+    best_sharpe_fold = max(folds, key=lambda f: f.oos_sharpe)
+    logger.info("fold_selected",
+        selected_fold=selected.fold_number,
+        selected_oos_sharpe=selected.oos_sharpe,
+        best_sharpe_fold=best_sharpe_fold.fold_number,
+        best_sharpe_value=best_sharpe_fold.oos_sharpe,
+        note="selecting_latest_not_best")
+    
+    return selected
+\`\`\`
+
+# TEST (T-4)
+Assert: with 12 folds of varying OOS Sharpe, select_best() returns fold 12.
+Assert: fold 12 need not have the highest OOS Sharpe.`
+  },
+  {
+    id: 18, layer:"hardening", isNew:true,
+    title: "Fix CF-2: Walk-Forward Embargo",
+    desc: "Adds embargo_bars gap between in-sample and OOS windows to eliminate serial correlation leakage.",
+    difficulty: "★★★",
+    tags: ["CF-2", "walk_forward.py", "leakage", "embargo", "CRITICAL"],
+    prompt: `Fix CRITICAL bug CF-2 in walk_forward.py.
+
+# BUG
+File: walk_forward.py lines 111–114
+OOS starts bar after IS ends with no embargo. First 180 OOS bars share feature/target overlap
+with IS (lookback=120, horizon=60). Inflates OOS metrics via serial correlation.
+
+# FIX SPECIFICATION
+New parameter: embargo_bars = lookback_window + max(horizons) = 120 + 60 = 180
+OOS start = is_end + embargo_bars
+
+# IMPLEMENTATION
+\`\`\`python
+def generate_folds(
+    self,
+    data: pd.DataFrame,
+    embargo_bars: int | None = None,  <span class="comment"># CF-2: default from config</span>
+) -> list[FoldSpec]:
+    if embargo_bars is None:
+        embargo_bars = self.lookback_window + max(self.horizons)  <span class="comment"># = 180</span>
+    
+    folds = []
+    for fold_num in range(self.n_folds):
+        is_start = fold_num * self.fold_size
+        is_end = is_start + self.fold_size
+        oos_start = is_end + embargo_bars  <span class="comment"># CF-2 fix: add embargo gap</span>
+        oos_end = oos_start + self.oos_size
+        
+        if oos_end > len(data):
+            break
+        folds.append(FoldSpec(fold_num, is_start, is_end, oos_start, oos_end))
+    return folds
+\`\`\`
+
+Add to training.yaml:
+  embargo_bars: 180  <span class="comment"># = lookback_window(120) + max_horizon(60)</span>
+
+# TEST (T-1)
+Assert: oos_start - is_end >= 180 for all generated folds.
+Assert: no index overlap between IS and OOS windows.`
+  },
+  {
+    id: 19, layer:"hardening", isNew:true,
+    title: "Fix CF-3: Annualization Factor",
+    desc: "Corrects √252 → √(252×390) in walk_forward.py and metrics.py for minute-bar data.",
+    difficulty: "★★☆",
+    tags: ["CF-3", "walk_forward.py", "metrics.py", "Sharpe", "CRITICAL"],
+    prompt: `Fix CRITICAL bug CF-3 in walk_forward.py and metrics.py.
+
+# BUG
+Both files use √252 (daily) but platform processes minute bars.
+Correct: √(252 × 390) ≈ 313.5. Current code understates Sharpe by ~20×.
+This makes the 0.5 OOS Sharpe gate trivially easy to pass.
+
+# FIX — walk_forward.py (line 166) and metrics.py (line 94)
+
+\`\`\`python
+<span class="comment"># Shared utility (add to shared/metrics_utils.py)</span>
+def annualization_factor(bars_per_day: int = 1) -> float:
+    """Sharpe annualization. Use bars_per_day=390 for 1-min bars, 1 for daily."""
+    return math.sqrt(252 * bars_per_day)
+
+<span class="comment"># In WalkForward.__init__ and BacktestMetrics.__init__:</span>
+self.bars_per_day: int = config.get("bars_per_day", 1)
+self._ann_factor = annualization_factor(self.bars_per_day)
+
+<span class="comment"># Replace hardcoded √252:</span>
+sharpe = (mean_returns / std_returns) * self._ann_factor  <span class="comment"># was: * math.sqrt(252)</span>
+\`\`\`
+
+Add to training.yaml and backtest configs:
+  bars_per_day: 390  <span class="comment"># 1-min bars, 6.5h × 60min</span>
+
+# TEST (T-3)
+Synthetic: 390 daily returns with known Sharpe=1.0 (daily).
+Assert: minute-bar version (same returns, bars_per_day=390) produces Sharpe ≈ 1.0.
+Assert: old code would produce Sharpe ≈ 0.048 (20× understated).`
+  },
+  {
+    id: 20, layer:"hardening", isNew:true,
+    title: "Fix CF-4: Feature Normalization Persistence",
+    desc: "Saves per-fold mean/std stats as JSON sidecar for ONNX inference to use at runtime.",
+    difficulty: "★★☆",
+    tags: ["CF-4", "dataset.py", "ONNX", "normalization", "CRITICAL"],
+    prompt: `Fix CRITICAL bug CF-4: feature normalization stats not persisted for inference.
+
+# BUG
+dataset.py:62-71: _normalize_features() computes per-sample mean/std but doesn't save them.
+At inference time, features are normalized with different stats → silent distribution shift.
+
+# FIX PART 1 — Training (dataset.py)
+\`\`\`python
+def _normalize_features(self, df: pd.DataFrame, fold_id: str, artifact_dir: Path) -> pd.DataFrame:
+    stats = {}
+    for col in self.feature_columns:
+        mean = df[col].mean()
+        std = df[col].std()
+        stats[col] = {"mean": float(mean), "std": float(std) if std > 0 else 1.0}
+        df[col] = (df[col] - mean) / stats[col]["std"]
+    
+    <span class="comment"># CF-4 fix: save alongside ONNX artifact</span>
+    stats_path = artifact_dir / f"norm_stats_{fold_id}.json"
+    stats_path.write_text(json.dumps(stats, indent=2))
+    logger.info("norm_stats_saved", path=str(stats_path), fold_id=fold_id)
+    return df
+\`\`\`
+
+# FIX PART 2 — Inference (model_inference/engine.py)
+\`\`\`python
+def _load_norm_stats(self, model_path: Path) -> dict:
+    stats_path = model_path.parent / f"norm_stats_{self.model_id}.json"
+    if not stats_path.exists():
+        raise FileNotFoundError(f"Normalization stats not found: {stats_path}")
+    return json.loads(stats_path.read_text())
+
+def _apply_norm(self, features: np.ndarray, stats: dict) -> np.ndarray:
+    for i, col in enumerate(self.feature_columns):
+        features[:, i] = (features[:, i] - stats[col]["mean"]) / stats[col]["std"]
+    return features
+\`\`\`
+
+# TEST (T-2)
+Round-trip: normalize features during training, save stats, reload at inference, re-apply.
+Assert: max absolute error between original normalized values and round-tripped values < 1e-6.`
+  },
+];
+
+// ── RENDER ──────────────────────────────────────────────────────────────────
+function plainText(p) {
+  return p.prompt.replace(/<[^>]+>/g, '');
+}
+
+function renderCard(p, idx) {
+  const newBadge = p.isNew ? `<span class="new-badge">New</span>` : '';
+  const tagsHtml = p.tags.map(t => {
+    const cls = t.startsWith('CF-') ? 'critical' : (p.isNew ? 'new' : '');
+    return `<span class="tag ${cls}">${t}</span>`;
+  }).join('');
+
+  return `
+  <div class="card"
+    data-layer="${p.layer}"
+    data-search="${(p.title + ' ' + p.desc + ' ' + p.tags.join(' ')).toLowerCase()}"
+    style="animation-delay:${Math.min(idx,8)*0.04}s"
+  >
+    <div class="card-stripe s-${p.layer}"></div>
+    <div class="card-head">
+      <div class="card-meta">
+        <span class="card-layer l-${p.layer}">${p.layer}</span>
+        <span class="card-difficulty">${p.difficulty}</span>
+      </div>
+      <div class="card-title">${p.title}${newBadge}</div>
+      <div class="card-desc">${p.desc}</div>
+    </div>
+    <div class="card-tags">${tagsHtml}</div>
+    <div class="card-body">
+      <div class="prompt-wrap">
+        <div class="prompt-box left-bar-${p.layer}" id="pb-${p.id}">${p.prompt}</div>
+        <div class="fade-out" id="fo-${p.id}"></div>
+      </div>
+    </div>
+    <div class="card-foot">
+      <button class="btn btn-copy" onclick="copyIt(${p.id},this)">Copy</button>
+      <button class="btn btn-expand" onclick="expandIt(${p.id},this)">Expand</button>
+    </div>
+  </div>`;
+}
+
+function copyIt(id, btn) {
+  const p = P.find(x => x.id === id);
+  navigator.clipboard.writeText(plainText(p)).then(() => {
+    btn.textContent = '✓ Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+  });
+}
+
+function expandIt(id, btn) {
+  const box = document.getElementById(`pb-${id}`);
+  const fo  = document.getElementById(`fo-${id}`);
+  const exp = box.classList.toggle('expanded');
+  fo.style.opacity = exp ? '0' : '';
+  btn.textContent  = exp ? 'Collapse' : 'Expand';
+}
+
+let activeFilter = 'all', searchVal = '';
+
+function renderGrid() {
+  const grid = document.getElementById('prompt-grid');
+  const filtered = P.filter(p => {
+    const matchLayer = activeFilter === 'all' || p.layer === activeFilter;
+    const matchSearch = !searchVal || p['data-search'] !== undefined
+      ? (p.title + ' ' + p.desc + ' ' + p.tags.join(' ')).toLowerCase().includes(searchVal)
+      : true;
+    return matchLayer && matchSearch;
+  });
+
+  document.getElementById('visible-count').textContent = filtered.length;
+  document.getElementById('total-count').textContent = P.length;
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">∅</div><p>No prompts match your filters.</p></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map((p,i) => renderCard(p,i)).join('');
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    renderGrid();
+  });
+});
+
+document.getElementById('search-input').addEventListener('input', e => {
+  searchVal = e.target.value.toLowerCase();
+  renderGrid();
+});
+
+renderGrid();
+</script>
+</body>
+</html>

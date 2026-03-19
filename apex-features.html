@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX — Features</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #050608;
+  --deep: #0a0c12;
+  --surface: #0f1119;
+  --raised: #151820;
+  --border: #1e2330;
+  --border2: #2a3045;
+  --text: #c2c8d8;
+  --text-bright: #edf0f8;
+  --text-dim: #4a5270;
+  --gold: #f0b429;
+  --gold-dim: #f0b42920;
+  --cyan: #00d4ff;
+  --cyan-dim: #00d4ff15;
+  --green: #00e676;
+  --green-dim: #00e67618;
+  --red: #ff4444;
+  --purple: #a855f7;
+  --purple-dim: #a855f715;
+  --orange: #ff7043;
+  --orange-dim: #ff704318;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, #ffffff18, transparent),
+    radial-gradient(1px 1px at 60% 70%, #ffffff10, transparent),
+    radial-gradient(1px 1px at 80% 20%, #ffffff12, transparent),
+    radial-gradient(600px at 10% 0%, #00d4ff06, transparent),
+    radial-gradient(600px at 90% 100%, #a855f706, transparent);
+  pointer-events: none; z-index: 0;
+}
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(5,6,8,0.92);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+  backdrop-filter: blur(14px);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; letter-spacing: 0.14em;
+  color: var(--green); text-decoration: none;
+}
+.nav-logo span { color: var(--text-dim); }
+.nav-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 4px 12px; border: 1px solid var(--border);
+}
+
+/* HERO */
+.hero {
+  padding: 72px 0 52px;
+  text-align: center;
+}
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 18px;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; width: 40px; height: 1px; background: currentColor; opacity: 0.35;
+}
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(52px, 9vw, 96px);
+  letter-spacing: 0.07em; line-height: 0.92;
+  background: linear-gradient(135deg, var(--green) 0%, var(--cyan) 55%, var(--purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-sub {
+  font-size: 15px; color: var(--text-dim); max-width: 580px;
+  margin: 16px auto 0; font-weight: 300; line-height: 1.7;
+}
+.hero-count {
+  display: inline-flex; gap: 28px; flex-wrap: wrap; justify-content: center;
+  margin-top: 32px; padding: 16px 32px;
+  border: 1px solid var(--border); background: var(--surface);
+}
+.count-item { text-align: center; }
+.count-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px; letter-spacing: 0.06em; line-height: 1;
+}
+.count-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-dim); margin-top: 3px;
+}
+.c-green { color: var(--green); }
+.c-cyan  { color: var(--cyan); }
+.c-gold  { color: var(--gold); }
+.c-purple{ color: var(--purple); }
+
+/* SECTION */
+.section { padding: 56px 0; border-top: 1px solid var(--border); }
+.section-header { display: flex; align-items: baseline; gap: 14px; margin-bottom: 32px; }
+.section-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em;
+}
+h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: 0.06em; color: var(--text-bright);
+}
+h2 em { font-style: normal; }
+
+/* FEATURE GRID */
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+.feat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 22px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+  animation: fadeUp 0.5s ease both;
+}
+.feat-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.feat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.fc-green::before  { background: var(--green); }
+.fc-cyan::before   { background: var(--cyan); }
+.fc-purple::before { background: var(--purple); }
+.fc-gold::before   { background: var(--gold); }
+.fc-orange::before { background: var(--orange); }
+
+.feat-icon { font-size: 22px; margin-bottom: 10px; }
+.feat-title {
+  font-size: 14px; font-weight: 700; color: var(--text-bright); margin-bottom: 8px;
+}
+.feat-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 2px 8px; border: 1px solid; display: inline-block; margin-bottom: 10px;
+}
+.fb-new    { color: var(--green);  border-color: var(--green);  background: var(--green-dim); }
+.fb-lean   { color: var(--purple); border-color: var(--purple); background: var(--purple-dim); }
+.fb-fix    { color: var(--gold);   border-color: var(--gold);   background: var(--gold-dim); }
+.fb-infra  { color: var(--cyan);   border-color: var(--cyan);   background: var(--cyan-dim); }
+
+.feat-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.65; }
+
+/* CALLOUT */
+.callout {
+  border: 1px solid; padding: 16px 20px;
+  font-size: 13px; line-height: 1.6; margin-bottom: 28px;
+}
+.c-green-box { border-color: #00e67635; background: #00e67608; color: var(--text); }
+.c-green-box strong { color: var(--green); }
+.c-purple-box { border-color: #a855f735; background: #a855f708; color: var(--text); }
+.c-purple-box strong { color: var(--purple); }
+
+/* LEGEND */
+.legend {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  margin-bottom: 28px; padding: 14px 18px;
+  border: 1px solid var(--border); background: var(--surface);
+}
+.legend-item {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* CATEGORY LABEL */
+.cat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 14px; margin-top: 28px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.cat-label:first-child { margin-top: 0; }
+
+/* FOOTER */
+footer {
+  padding: 40px 0; text-align: center;
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em; color: var(--text-dim);
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px; letter-spacing: 0.12em; color: var(--green); margin-bottom: 8px;
+}
+
+/* FILTER TABS */
+.filter-bar {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 28px;
+}
+.filter-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 6px 14px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-dim);
+  cursor: pointer; transition: all 0.15s;
+}
+.filter-btn:hover { color: var(--text-bright); border-color: var(--border2); }
+.filter-btn.active { color: #000; border-color: transparent; }
+.fb-all.active    { background: var(--text-dim); color: var(--void); }
+.fb-new.active    { background: var(--green); }
+.fb-lean.active   { background: var(--purple); color: #fff; }
+.fb-fix.active    { background: var(--gold); }
+.fb-infra.active  { background: var(--cyan); }
+
+.feat-card.hidden { display: none; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-inner">
+    <a class="nav-logo" href="#">APEX <span>// Signal Intelligence</span></a>
+    <div class="nav-tag">Features · Master Blueprint 2026</div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Autonomous Predictive Execution</div>
+    <div class="hero-title">APEX<br>Features</div>
+    <p class="hero-sub">
+      The best of AWET's infrastructure, Unified Platform's ensemble signals,
+      and Lean's institutional-grade framework — fused into one.
+    </p>
+    <div class="hero-count">
+      <div class="count-item">
+        <div class="count-num c-green">10</div>
+        <div class="count-label">New APEX</div>
+      </div>
+      <div class="count-item" style="border-left:1px solid var(--border);padding-left:28px;">
+        <div class="count-num c-purple">9</div>
+        <div class="count-label">From Lean</div>
+      </div>
+      <div class="count-item" style="border-left:1px solid var(--border);padding-left:28px;">
+        <div class="count-num c-gold">6</div>
+        <div class="count-label">Bug Fixes</div>
+      </div>
+      <div class="count-item" style="border-left:1px solid var(--border);padding-left:28px;">
+        <div class="count-num c-cyan">19</div>
+        <div class="count-label">Total</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SECTION -->
+  <div class="section" id="features">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>All <em style="color:var(--green)">Features</em></h2>
+    </div>
+
+    <div class="callout c-green-box">
+      <strong>Three codebases. One platform.</strong> APEX merges AWET's Kafka streaming backbone, the Unified Platform's ML ensemble, and Lean's institutional portfolio framework. Every feature below maps to a specific source and build phase.
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-bar">
+      <button class="filter-btn fb-all active" onclick="filter('all', this)">All</button>
+      <button class="filter-btn fb-new" onclick="filter('new', this)">★ New APEX</button>
+      <button class="filter-btn fb-lean" onclick="filter('lean', this)">From Lean</button>
+      <button class="filter-btn fb-fix" onclick="filter('fix', this)">Bug Fixes</button>
+      <button class="filter-btn fb-infra" onclick="filter('infra', this)">Infrastructure</button>
+    </div>
+
+    <!-- NEW APEX -->
+    <div class="cat-label">★ New APEX-Specific Features</div>
+    <div class="feat-grid">
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">🧮</div>
+        <div class="feat-title">Bayesian Weight Updater</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">Replaces fixed ensemble weights (40/15/15/10/10/10) with dynamic, performance-tracked Bayesian weights. Each alpha source earns its allocation based on rolling accuracy — the ensemble improves itself over time.</p>
+      </div>
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">💬</div>
+        <div class="feat-title">Reddit Sentiment → Ensemble</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">Wires already-collected Reddit sentiment data into the signal ensemble at a 10% weight. Previously collected but never used — now a live alpha source feeding directly into the weighted vote.</p>
+      </div>
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">📈</div>
+        <div class="feat-title">Stochastic %K/%D Signal</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">New alpha source via Lean's Stochastic oscillator at 10% ensemble weight. Adds momentum-confirmation and overbought/oversold detection as a distinct voice in the ensemble voting process.</p>
+      </div>
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">🌐</div>
+        <div class="feat-title">Signal Provider FastAPI</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">Public-facing API endpoint that exposes APEX's ensemble signals in real-time. Enables external consumers, dashboards, and third-party integrations to pull signal data via REST.</p>
+      </div>
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">🤖</div>
+        <div class="feat-title">Signal Analyst LLM Agent</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">Local Ollama (qwen2.5:32b) agent that interprets signal outputs, explains ensemble decisions in plain language, and flags unusual patterns. Runs fully on-device — no external API calls.</p>
+      </div>
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">📋</div>
+        <div class="feat-title">Walk-Forward Reviewer Agent</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">Automated LLM agent that reviews walk-forward results after each run, generates a PDF summary, and delivers it via Telegram. Closes the feedback loop between training and deployment decisions.</p>
+      </div>
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">🌍</div>
+        <div class="feat-title">LiquidETF Universe Selector</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">Replaces the hardcoded universe.csv with a dynamic ETF-constituent selector. Assets are chosen daily based on liquidity, volume, and spread filters — the portfolio stays fresh without manual CSV edits.</p>
+      </div>
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">⚖️</div>
+        <div class="feat-title">Black-Litterman Portfolio Construction</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">Uses TFT model forecasts as Bayesian "views" fed into Lean's BlackLittermanOptimizationPortfolioConstructionModel. Blends your alpha with market equilibrium returns — far superior to equal-weighting.</p>
+      </div>
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">🎯</div>
+        <div class="feat-title">VWAP Execution Model</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">Replaces immediate market orders with VWAP-sliced execution. Orders are split across 60-second intervals, targeting VWAP or better entry/exit — directly reducing slippage cost on every trade.</p>
+      </div>
+
+      <div class="feat-card fc-green" data-cat="new">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Grafana Ensemble Dashboard</div>
+        <span class="feat-badge fb-new">★ New</span>
+        <p class="feat-desc">Real-time Grafana panels showing per-source signal contribution, Bayesian weight history, ensemble confidence, and regime state — giving full visibility into what's driving each trade decision.</p>
+      </div>
+
+    </div>
+
+    <!-- FROM LEAN -->
+    <div class="cat-label">From QuantConnect Lean</div>
+    <div class="feat-grid">
+
+      <div class="feat-card fc-purple" data-cat="lean">
+        <div class="feat-icon">🧠</div>
+        <div class="feat-title">Insight Objects (Typed Signals)</div>
+        <span class="feat-badge fb-lean">Lean</span>
+        <p class="feat-desc">Direction + Magnitude + Confidence + Period in one typed struct. Lean's Insight.Group() lets you trade pairs and straddles atomically, with expiry awareness and cancellation — not possible with your current signals.scored events.</p>
+      </div>
+
+      <div class="feat-card fc-purple" data-cat="lean">
+        <div class="feat-icon">📐</div>
+        <div class="feat-title">Mean-Variance Optimizer</div>
+        <span class="feat-badge fb-lean">Lean</span>
+        <p class="feat-desc">MaximumSharpeRatioPortfolioOptimizer and MinimumVariancePortfolioOptimizer turn your ensemble signal into an optimally weighted portfolio. Handles short-selling constraints natively, no custom implementation needed.</p>
+      </div>
+
+      <div class="feat-card fc-purple" data-cat="lean">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">100+ Built-in Indicators</div>
+        <span class="feat-badge fb-lean">Lean</span>
+        <p class="feat-desc">Bollinger Bands, ATR, Williams %R, Ichimoku, ADX, Aroon, CCI, Donchian, Keltner — all warmup-aware, battle-tested, and auto-updated on new bars. Currently being reinvented manually in your codebase.</p>
+      </div>
+
+      <div class="feat-card fc-purple" data-cat="lean">
+        <div class="feat-icon">🔬</div>
+        <div class="feat-title">Multi-Asset Class Support</div>
+        <span class="feat-badge fb-lean">Lean</span>
+        <p class="feat-desc">Equities, Forex, Options, Futures, Crypto, CFDs from one unified portfolio. Adding crypto or options to AWET/Unified would require rebuilding the execution layer — Lean handles it out of the box from day one.</p>
+      </div>
+
+      <div class="feat-card fc-purple" data-cat="lean">
+        <div class="feat-icon">🗓️</div>
+        <div class="feat-title">Scheduled Events + Market Hours</div>
+        <span class="feat-badge fb-lean">Lean</span>
+        <p class="feat-desc">Schedule.On(DateRules.EveryDay, TimeRules.AfterMarketOpen(30)) is far more robust than the hardcoded UTC-5 DST bug (HI-5). Lean handles all timezone edge cases and DST transitions automatically.</p>
+      </div>
+
+      <div class="feat-card fc-purple" data-cat="lean">
+        <div class="feat-icon">🏛️</div>
+        <div class="feat-title">Composite Risk Management</div>
+        <span class="feat-badge fb-lean">Lean</span>
+        <p class="feat-desc">Stack multiple risk models via AddRiskManagement(): MaximumDrawdownPercentPortfolio + TrailingStopRiskManagementModel + MaximumSectorExposureRiskManagementModel — all running on every portfolio update cycle.</p>
+      </div>
+
+      <div class="feat-card fc-purple" data-cat="lean">
+        <div class="feat-icon">⏱️</div>
+        <div class="feat-title">SpreadExecution Model</div>
+        <span class="feat-badge fb-lean">Lean</span>
+        <p class="feat-desc">Companion to VWAP execution — Lean's SpreadExecutionModel places orders only when the bid-ask spread is within acceptable bounds. Reduces adverse fills during illiquid periods without custom code.</p>
+      </div>
+
+      <div class="feat-card fc-purple" data-cat="lean">
+        <div class="feat-icon">🎲</div>
+        <div class="feat-title">ConfidenceWeighted Allocation</div>
+        <span class="feat-badge fb-lean">Lean</span>
+        <p class="feat-desc">Lean's ConfidenceWeightedPortfolioConstructionModel sizes positions proportionally to each Insight's confidence score. When TFT is 90% confident vs 55%, the position sizes reflect that — fixed sizing doesn't.</p>
+      </div>
+
+      <div class="feat-card fc-purple" data-cat="lean">
+        <div class="feat-icon">📅</div>
+        <div class="feat-title">TimescaleDB Continuous Aggregates</div>
+        <span class="feat-badge fb-lean">Lean</span>
+        <p class="feat-desc">5m, 15m, and 1h continuous aggregates maintained automatically by TimescaleDB. Removes the need to manually compute multi-resolution OHLCV from tick data on every query — drastically reducing latency.</p>
+      </div>
+
+    </div>
+
+    <!-- BUG FIXES THAT UNLOCK FEATURES -->
+    <div class="cat-label">Bug Fixes That Unlock Features</div>
+    <div class="feat-grid">
+
+      <div class="feat-card fc-gold" data-cat="fix">
+        <div class="feat-icon">🔧</div>
+        <div class="feat-title">Direction-Aware Regime Filter</div>
+        <span class="feat-badge fb-fix">Fix HI-4</span>
+        <p class="feat-desc">Bear regime currently generates wrong signals — it should flip long signals to short, but doesn't. Fixing HI-4 makes the regime filter meaningful: bull = go long, bear = go short or stand aside, sideways = tighten thresholds.</p>
+      </div>
+
+      <div class="feat-card fc-gold" data-cat="fix">
+        <div class="feat-icon">🎯</div>
+        <div class="feat-title">Platt Calibration (Fixed)</div>
+        <span class="feat-badge fb-fix">Fix HI-3</span>
+        <p class="feat-desc">Has a silent bug where it runs on an unfitted model without raising an error. After fix, calibrated confidence scores are trustworthy and can be used for ConfidenceWeighted position sizing without hidden drift.</p>
+      </div>
+
+      <div class="feat-card fc-gold" data-cat="fix">
+        <div class="feat-icon">📉</div>
+        <div class="feat-title">Real CVaR-95 Risk Budgeting</div>
+        <span class="feat-badge fb-fix">Fix CF-5</span>
+        <p class="feat-desc">Current CVaR formula is statistically meaningless. After fix, CVaR-95 computes the true expected tail loss using historical simulation — enabling proper risk budgeting across positions and portfolio-level drawdown limits.</p>
+      </div>
+
+      <div class="feat-card fc-gold" data-cat="fix">
+        <div class="feat-icon">🔐</div>
+        <div class="feat-title">Fail-Closed Redis Kill Switch</div>
+        <span class="feat-badge fb-fix">Fix CF-6</span>
+        <p class="feat-desc">Current implementation resets daily loss counters on any Redis crash — a ruin path. After fix, any Redis failure immediately halts trading (fail-closed). The kill switch becomes a genuine circuit breaker.</p>
+      </div>
+
+      <div class="feat-card fc-gold" data-cat="fix">
+        <div class="feat-icon">💾</div>
+        <div class="feat-title">Normalization Sidecar Persistence</div>
+        <span class="feat-badge fb-fix">Fix CF-4</span>
+        <p class="feat-desc">Training normalization stats are currently discarded, so inference uses wrong statistics silently. After fix, a JSON sidecar is saved per fold — inference loads the exact same stats used in training, eliminating silent feature drift.</p>
+      </div>
+
+      <div class="feat-card fc-gold" data-cat="fix">
+        <div class="feat-icon">📏</div>
+        <div class="feat-title">Correct Sharpe Annualization</div>
+        <span class="feat-badge fb-fix">Fix CF-3</span>
+        <p class="feat-desc">Current code uses √252 (daily) but data is at 1-minute bars — should be √(252×390). All reported Sharpe numbers are wrong by ~20×. After fix, OOS Sharpe gate comparisons are meaningful and walk-forward selection is valid.</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-logo">APEX</div>
+    <div>AWET-main · Unified Trading Platform · QuantConnect Lean · Blueprint 2026</div>
+    <div style="margin-top:6px;font-size:9px;letter-spacing:0.08em;opacity:0.5;">For paper trading only. Not financial advice.</div>
+  </div>
+</footer>
+
+<script>
+function filter(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.feat-card').forEach(card => {
+    if (cat === 'all' || card.dataset.cat === cat) {
+      card.classList.remove('hidden');
+      card.style.animation = 'none';
+      requestAnimationFrame(() => { card.style.animation = 'fadeUp 0.35s ease both'; });
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+  // hide empty category labels
+  document.querySelectorAll('.cat-label').forEach(label => {
+    const grid = label.nextElementSibling;
+    if (grid) {
+      const visible = Array.from(grid.querySelectorAll('.feat-card')).some(c => !c.classList.contains('hidden'));
+      label.style.display = visible ? '' : 'none';
+    }
+  });
+}
+</script>
+</body>
+</html>

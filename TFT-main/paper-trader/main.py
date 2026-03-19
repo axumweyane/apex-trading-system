@@ -21,6 +21,10 @@ import logging
 import os
 import sys
 from contextlib import asynccontextmanager
+
+# Load .env from project root
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
 from datetime import datetime, date, timezone, timedelta
 from typing import Any, Dict, List, Optional
 

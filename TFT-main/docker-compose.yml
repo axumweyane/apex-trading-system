@@ -149,61 +149,8 @@ services:
     #           count: 1
     #           capabilities: [gpu]
 
-  tft-predictor:
-    build: ./microservices/tft-predictor
-    ports:
-      - "8003:8003"
-    environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka-broker:9092
-      - REDIS_URL=redis://redis:6379
-      - POSTGRES_URL=postgresql://tft_user:tft_password@postgres:5432/tft_trading
-    depends_on:
-      - redis
-      - postgres
-    restart: unless-stopped
-    # For GPU support (uncomment if you have NVIDIA GPU)
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
-
-  trading-engine:
-    build: ./microservices/trading-engine
-    ports:
-      - "8004:8004"
-    environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka-broker:9092
-      - REDIS_URL=redis://redis:6379
-      - POSTGRES_URL=postgresql://tft_user:tft_password@postgres:5432/tft_trading
-      - ALPACA_API_KEY=${ALPACA_API_KEY}
-      - ALPACA_API_SECRET=${ALPACA_API_SECRET}
-      - ALPACA_BASE_URL=${ALPACA_BASE_URL:-https://paper-api.alpaca.markets}
-    depends_on:
-      - redis
-      - postgres
-    restart: unless-stopped
-
-  orchestrator:
-    build: ./microservices/orchestrator
-    ports:
-      - "8000:8000"
-    environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka-broker:9092
-      - REDIS_URL=redis://redis:6379
-      - DATA_INGESTION_URL=http://data-ingestion:8001
-      - SENTIMENT_ENGINE_URL=http://sentiment-engine:8002
-      - TFT_PREDICTOR_URL=http://tft-predictor:8003
-      - TRADING_ENGINE_URL=http://trading-engine:8004
-    depends_on:
-      - redis
-      - data-ingestion
-      - sentiment-engine
-      - tft-predictor
-      - trading-engine
-    restart: unless-stopped
+  # NOTE: tft-predictor, trading-engine, orchestrator defined above (lines 59-125).
+  # Duplicate definitions removed to fix YAML parsing.
 
   # APEX Paper Trader — Multi-Strategy Ensemble Runner
   paper-trader:

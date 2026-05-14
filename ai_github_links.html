@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top AI GitHub Profiles & Repos</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; padding: 20px; }
+  h1 { color: #58a6ff; text-align: center; margin-bottom: 8px; font-size: 1.8em; }
+  .subtitle { text-align: center; color: #8b949e; margin-bottom: 30px; }
+  h2 { color: #f0883e; margin: 30px 0 15px; border-bottom: 1px solid #21262d; padding-bottom: 8px; }
+  h3 { color: #8b949e; margin: 20px 0 10px; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 16px; margin: 8px 0; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s; }
+  .card:hover { border-color: #58a6ff; }
+  .info { flex: 1; }
+  .name { font-weight: 600; color: #c9d1d9; }
+  .desc { font-size: 0.85em; color: #8b949e; margin-top: 2px; }
+  .btn { display: inline-block; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 0.85em; font-weight: 600; margin-left: 8px; transition: opacity 0.2s; }
+  .btn:hover { opacity: 0.85; }
+  .btn-follow { background: #238636; color: #fff; }
+  .btn-star { background: #da3633; color: #fff; }
+  .btn-profile { background: #30363d; color: #c9d1d9; }
+  .no-link { color: #484f58; font-style: italic; font-size: 0.85em; margin-left: 8px; }
+  .open-all { display: block; margin: 20px auto; padding: 12px 32px; background: #58a6ff; color: #0d1117; border: none; border-radius: 8px; font-size: 1em; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+  .open-all:hover { opacity: 0.85; }
+  .note { background: #161b22; border: 1px solid #f0883e; border-radius: 8px; padding: 16px; margin: 20px 0; color: #f0883e; text-align: center; font-size: 0.9em; }
+  .counter { text-align: center; color: #8b949e; margin: 10px 0; font-size: 0.9em; }
+</style>
+</head>
+<body>
+
+<h1>Top AI on GitHub</h1>
+<p class="subtitle">Click buttons to open profile pages, then follow/star. Or use "Open All" to batch-open tabs.</p>
+<div class="note">You must be <strong>logged into GitHub</strong> for follow/star to work. Each link opens in a new tab.</div>
+
+<!-- ==================== PEOPLE ==================== -->
+<h2>Top 30 AI People to Follow</h2>
+<p class="counter" id="people-counter">0 / 23 opened</p>
+<button class="open-all" onclick="openAll('people')">Open All People Profiles (23 tabs)</button>
+
+<h3>Founders / Legends</h3>
+<div class="card" data-group="people"><div class="info"><span class="name">1. Andrej Karpathy</span><div class="desc">Neural Nets Zero to Hero, ex-Tesla AI</div></div><a class="btn btn-profile" href="https://github.com/karpathy" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">2. Andrew Ng</span><div class="desc">Coursera ML, DeepLearning.AI</div></div><a class="btn btn-profile" href="https://github.com/andrewng" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">3. Yann LeCun</span><div class="desc">CNNs pioneer, Meta FAIR</div></div><a class="btn btn-profile" href="https://github.com/ylecun" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">4. Yoshua Bengio</span><div class="desc">Turing Award, Mila</div></div><a class="btn btn-profile" href="https://github.com/yoshuabengio" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card"><div class="info"><span class="name">5. Geoffrey Hinton</span><div class="desc">Turing Award, Godfather of Deep Learning</div></div><span class="no-link">No public GitHub</span></div>
+<div class="card" data-group="people"><div class="info"><span class="name">6. Ilya Sutskever</span><div class="desc">Co-founder OpenAI, SSI</div></div><a class="btn btn-profile" href="https://github.com/ilyasu" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card"><div class="info"><span class="name">7. Demis Hassabis</span><div class="desc">DeepMind, AlphaFold, AlphaGo</div></div><span class="no-link">No public GitHub</span></div>
+
+<h3>Builders / Content Creators</h3>
+<div class="card" data-group="people"><div class="info"><span class="name">8. Sebastian Raschka</span><div class="desc">ML books, LLM from scratch</div></div><a class="btn btn-profile" href="https://github.com/rasbt" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">9. Lucidrains (Phil Wang)</span><div class="desc">Paper implementations in PyTorch</div></div><a class="btn btn-profile" href="https://github.com/lucidrains" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">10. Goku Mohandas</span><div class="desc">Made With ML</div></div><a class="btn btn-profile" href="https://github.com/GokuMohandas" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">11. Harrison Chase</span><div class="desc">LangChain creator</div></div><a class="btn btn-profile" href="https://github.com/hwchase17" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">12. Georgi Gerganov</span><div class="desc">llama.cpp, whisper.cpp</div></div><a class="btn btn-profile" href="https://github.com/ggerganov" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">13. Lilian Weng</span><div class="desc">OpenAI, amazing AI blog</div></div><a class="btn btn-profile" href="https://github.com/lilianweng" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">14. Jeremy Howard</span><div class="desc">fast.ai, practical deep learning</div></div><a class="btn btn-profile" href="https://github.com/jnwhiteh" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">15. François Chollet</span><div class="desc">Keras creator</div></div><a class="btn btn-profile" href="https://github.com/fchollet" target="_blank" onclick="countOpen('people')">Profile</a></div>
+
+<h3>AI Agents / LLM Builders</h3>
+<div class="card" data-group="people"><div class="info"><span class="name">16. Significant Gravitas</span><div class="desc">AutoGPT</div></div><a class="btn btn-profile" href="https://github.com/Significant-Gravitas" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">17. Ollama team</span><div class="desc">Local LLM runner</div></div><a class="btn btn-profile" href="https://github.com/ollama" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">18. LangFlow team</span><div class="desc">Visual AI agent builder</div></div><a class="btn btn-profile" href="https://github.com/langflow-ai" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card"><div class="info"><span class="name">19. OpenClaw</span><div class="desc">Fastest-growing AI agent 2026</div></div><span class="no-link">No public GitHub</span></div>
+<div class="card" data-group="people"><div class="info"><span class="name">20. Hugging Face team</span><div class="desc">Transformers, models hub</div></div><a class="btn btn-profile" href="https://github.com/huggingface" target="_blank" onclick="countOpen('people')">Profile</a></div>
+
+<h3>AI Educators / YouTubers</h3>
+<div class="card" data-group="people"><div class="info"><span class="name">21. Sentdex (Harrison Kinsley)</span><div class="desc">Python ML tutorials</div></div><a class="btn btn-profile" href="https://github.com/Sentdex" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">22. Daniel Bourke</span><div class="desc">ML courses, ZTM</div></div><a class="btn btn-profile" href="https://github.com/mrdbourke" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">23. Lex Fridman</span><div class="desc">MIT, AI podcast</div></div><a class="btn btn-profile" href="https://github.com/lexfridman" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">24. 3Blue1Brown (Grant Sanderson)</span><div class="desc">Neural net visualizations</div></div><a class="btn btn-profile" href="https://github.com/3b1b" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card" data-group="people"><div class="info"><span class="name">25. Jay Alammar</span><div class="desc">Illustrated Transformer</div></div><a class="btn btn-profile" href="https://github.com/jalammar" target="_blank" onclick="countOpen('people')">Profile</a></div>
+
+<h3>AI Researchers</h3>
+<div class="card"><div class="info"><span class="name">26. Fei-Fei Li</span><div class="desc">Stanford HAI, ImageNet creator</div></div><span class="no-link">No public GitHub</span></div>
+<div class="card"><div class="info"><span class="name">27. Ashish Vaswani</span><div class="desc">Transformer paper "Attention Is All You Need"</div></div><span class="no-link">No public GitHub</span></div>
+<div class="card"><div class="info"><span class="name">28. Peter Stone</span><div class="desc">UT Austin RL professor</div></div><span class="no-link">No public GitHub</span></div>
+<div class="card" data-group="people"><div class="info"><span class="name">29. Pieter Abbeel</span><div class="desc">Berkeley, robotics RL</div></div><a class="btn btn-profile" href="https://github.com/pabbeel" target="_blank" onclick="countOpen('people')">Profile</a></div>
+<div class="card"><div class="info"><span class="name">30. Sergey Levine</span><div class="desc">Berkeley, deep RL</div></div><span class="no-link">No public GitHub</span></div>
+
+<!-- ==================== REPOS ==================== -->
+<h2>Top 30 Open-Source AI Repos to Star</h2>
+<p class="counter" id="repos-counter">0 / 25 opened</p>
+<button class="open-all" onclick="openAll('repos')">Open All Repos (25 tabs)</button>
+
+<h3>LLM / Chat</h3>
+<div class="card" data-group="repos"><div class="info"><span class="name">1. Ollama</span><div class="desc">Run LLMs locally</div></div><a class="btn btn-star" href="https://github.com/ollama/ollama" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">2. llama.cpp</span><div class="desc">C++ LLM inference</div></div><a class="btn btn-star" href="https://github.com/ggerganov/llama.cpp" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">3. Open WebUI</span><div class="desc">Self-hosted ChatGPT UI</div></div><a class="btn btn-star" href="https://github.com/open-webui/open-webui" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">4. vLLM</span><div class="desc">Fast LLM serving</div></div><a class="btn btn-star" href="https://github.com/vllm-project/vllm" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">5. LocalAI</span><div class="desc">Local OpenAI-compatible API</div></div><a class="btn btn-star" href="https://github.com/mudler/LocalAI" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+
+<h3>AI Agents</h3>
+<div class="card" data-group="repos"><div class="info"><span class="name">6. AutoGPT</span><div class="desc">Autonomous GPT agent</div></div><a class="btn btn-star" href="https://github.com/Significant-Gravitas/AutoGPT" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">7. LangChain</span><div class="desc">LLM application framework</div></div><a class="btn btn-star" href="https://github.com/langchain-ai/langchain" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">8. CrewAI</span><div class="desc">Multi-agent framework</div></div><a class="btn btn-star" href="https://github.com/crewAIInc/crewAI" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">9. n8n</span><div class="desc">Workflow automation + AI</div></div><a class="btn btn-star" href="https://github.com/n8n-io/n8n" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">10. Dify</span><div class="desc">LLM app builder</div></div><a class="btn btn-star" href="https://github.com/langgenius/dify" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+
+<h3>ML / Deep Learning Frameworks</h3>
+<div class="card" data-group="repos"><div class="info"><span class="name">11. PyTorch</span><div class="desc">Deep learning framework</div></div><a class="btn btn-star" href="https://github.com/pytorch/pytorch" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">12. Hugging Face Transformers</span><div class="desc">State-of-the-art NLP</div></div><a class="btn btn-star" href="https://github.com/huggingface/transformers" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">13. TensorFlow</span><div class="desc">ML platform</div></div><a class="btn btn-star" href="https://github.com/tensorflow/tensorflow" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">14. Scikit-learn</span><div class="desc">Classical ML library</div></div><a class="btn btn-star" href="https://github.com/scikit-learn/scikit-learn" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">15. JAX</span><div class="desc">High-performance ML research</div></div><a class="btn btn-star" href="https://github.com/jax-ml/jax" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+
+<h3>Generative AI / Diffusion</h3>
+<div class="card" data-group="repos"><div class="info"><span class="name">16. Stable Diffusion WebUI</span><div class="desc">AUTOMATIC1111 image generation</div></div><a class="btn btn-star" href="https://github.com/AUTOMATIC1111/stable-diffusion-webui" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">17. ComfyUI</span><div class="desc">Node-based diffusion UI</div></div><a class="btn btn-star" href="https://github.com/comfyanonymous/ComfyUI" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">18. Fooocus</span><div class="desc">Simple image generation</div></div><a class="btn btn-star" href="https://github.com/lllyasviel/Fooocus" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+
+<h3>NLP / RAG</h3>
+<div class="card" data-group="repos"><div class="info"><span class="name">19. LlamaIndex</span><div class="desc">Data framework for LLMs</div></div><a class="btn btn-star" href="https://github.com/run-llama/llama_index" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">20. Haystack</span><div class="desc">NLP framework</div></div><a class="btn btn-star" href="https://github.com/deepset-ai/haystack" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">21. spaCy</span><div class="desc">Industrial NLP</div></div><a class="btn btn-star" href="https://github.com/explosion/spaCy" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+
+<h3>Computer Vision</h3>
+<div class="card" data-group="repos"><div class="info"><span class="name">22. Ultralytics YOLOv8</span><div class="desc">Object detection</div></div><a class="btn btn-star" href="https://github.com/ultralytics/ultralytics" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">23. OpenCV</span><div class="desc">Computer vision library</div></div><a class="btn btn-star" href="https://github.com/opencv/opencv" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+<div class="card" data-group="repos"><div class="info"><span class="name">24. Segment Anything (SAM)</span><div class="desc">Meta image segmentation</div></div><a class="btn btn-star" href="https://github.com/facebookresearch/segment-anything" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+
+<h3>AI Coding</h3>
+<div class="card" data-group="repos"><div class="info"><span class="name">25. Aider</span><div class="desc">AI pair programming</div></div><a class="btn btn-star" href="https://github.com/paul-gauthier/aider" target="_blank" onclick="countOpen('repos')">Open Repo</a></div>
+
+<script>
+const counts = { people: 0, repos: 0 };
+const totals = { people: 23, repos: 25 };
+
+function countOpen(group) {
+  counts[group]++;
+  document.getElementById(group + '-counter').textContent = counts[group] + ' / ' + totals[group] + ' opened';
+}
+
+function openAll(group) {
+  const cards = document.querySelectorAll('[data-group="' + group + '"] a');
+  let delay = 0;
+  cards.forEach(link => {
+    setTimeout(() => {
+      window.open(link.href, '_blank');
+      countOpen(group);
+    }, delay);
+    delay += 300; // stagger to avoid popup blocker
+  });
+}
+</script>
+
+</body>
+</html>
